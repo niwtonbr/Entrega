@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -13,27 +12,30 @@
             --glass: rgba(255, 255, 255, 0.8);
             --glass-border: rgba(255, 255, 255, 0.2);
             --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            /* Estilização da Barra de Rolagem (Scrollbar) */
-::-webkit-scrollbar {im
-    width: 15px; /* Largura da barra */
-}
-
-::-webkit-scrollbar-track {
-    background: #5dc9ea; /* Cor do fundo da trilha */
-    border-radius: 15px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--honda-red); /* Cor da barra em si (mude aqui) */
-    border-radius: 10px;
-    border: 2px solid #f1f1f1; /* Cria um espaçamento ao redor da barra */
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--honda-dark); /* Cor quando passa o mouse */
-}
         }
+
+        /* Estilização da Barra de Rolagem (Scrollbar) */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #5dc9ea;
+            border-radius: 15px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--honda-red);
+            border-radius: 10px;
+            border: 2px solid #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--honda-dark);
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body { 
             font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; 
             background: var(--bg-color); 
@@ -42,6 +44,7 @@
             height: 100vh; 
             overflow: hidden; 
         }
+
         header { 
             background: linear-gradient(135deg, var(--honda-red), var(--honda-dark));
             color: white; 
@@ -52,16 +55,24 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             z-index: 100;
         }
+
         .header-left { display: flex; align-items: center; gap: 15px; }
+
+        /* LOGO AJUSTADA: Branca e Menor */
         .logo-honda { 
-    width: 45px; /* Reduzi de 60px para 45px para ficar "menos" */
-    filter: brightness(0) invert(1); /* Garante que a logo fique branca */
-    transition: 0.3s; 
-    object-fit: contain; /* Evita que a imagem distorça */
-}
+            width: 42px !important; 
+            height: auto;
+            filter: brightness(0) invert(1) !important;
+            transition: 0.3s; 
+            object-fit: contain;
+        }
+
         .logo-text { font-family: 'Brush Script MT', cursive; font-size: 36px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        
         #relogio { font-family: 'Consolas', monospace; font-weight: bold; font-size: 24px; background: #000; color: #00ff00; padding: 6px 18px; border-radius: 10px; border: 2px solid #444; }
+        
         .dashboard { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; }
+        
         .col-cadastro, .col-tabela { 
             background: var(--glass); 
             backdrop-filter: blur(10px);
@@ -70,23 +81,31 @@
             border-radius: 20px; 
             box-shadow: var(--shadow); 
         }
+
         .col-cadastro { flex: 0 0 360px; overflow-y: auto; }
         .col-tabela { flex: 1; display: flex; flex-direction: column; }
+
         h2 { font-size: 16px; color: var(--honda-red); border-bottom: 3px solid var(--honda-red); margin-bottom: 15px; padding-bottom: 5px; text-transform: uppercase; }
+        
         .form-group { margin-bottom: 12px; }
         label { display: block; font-size: 11px; font-weight: bold; color: #666; margin-bottom: 5px; text-transform: uppercase; }
         input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; }
         input:focus, select:focus { border-color: var(--honda-red); box-shadow: 0 0 8px rgba(204, 0, 0, 0.2); }
+        
         .readonly-box { background: #f9f9f9; font-weight: bold; color: var(--honda-red); }
+        
         .btn-enviar { width: 100%; padding: 15px; background: linear-gradient(to right, #1a1a7a, #0d0d4d); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 10px; transition: 0.3s; margin-top: 10px; }
         .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
+
         .table-container { flex: 1; overflow-y: auto; margin-top: 15px; border-radius: 10px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th { background: var(--honda-red); color: white; padding: 15px 8px; position: sticky; top: 0; text-align: center; text-transform: uppercase; }
         td { padding: 12px 8px; border-bottom: 1px solid #eee; text-align: center; }
+
         .btn-del { background: #ff4d4d; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
         .btn-relatorio { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .btn-limpar { background: #ff8c00; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
         .fab-analytics {
             position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
             border-radius: 50%; background: var(--honda-red); color: white;
@@ -94,6 +113,7 @@
             cursor: pointer; display: flex; flex-direction: column; justify-content: center;
             align-items: center; z-index: 1000;
         }
+
         .analytics-panel {
             position: fixed; top: 0; right: -100%; width: 450px; height: 100vh;
             background: var(--glass); backdrop-filter: blur(20px);
@@ -102,6 +122,7 @@
             display: flex; flex-direction: column; padding: 40px; border-left: 10px solid var(--honda-red);
         }
         .analytics-panel.open { right: 0; }
+
         @media print {
             header, .col-cadastro, .btn-del, #filtro-data, .btn-relatorio, .btn-limpar, .fab-analytics { display: none !important; }
             .dashboard { padding: 0; }
@@ -113,7 +134,8 @@
 
 <header>
     <div class="header-left">
-        <img src="{{ url_for('static', filename='logo_honda.png') }}" alt="Logo Honda" width="150">
+        <!-- Removido o width fixo para o CSS controlar -->
+        <img src="{{ url_for('static', filename='logo_honda.png') }}" alt="Logo Honda" class="logo-honda">
         <span class="logo-text">Tropical Motos</span>
     </div>
     <div id="relogio">00:00:00</div>
@@ -239,36 +261,27 @@
         } catch (e) { console.error(e); }
     }
 
-   function obterEstiloCor(nomeCor) {
-    if (!nomeCor) return "";
-    const c = nomeCor.toUpperCase();
-    
-    // VERMELHOS (O específico "METÁLICO" deve vir antes do geral "VERMELHA")
-    if (c.includes("VERMELHO METÁLICO")) return "background:#B00404; color:white;";
-    if (c.includes("VERMELHO PEROLIZADO")) return "background:#E93434; color:white;";
-    if (c.includes("VERMELHA") || c.includes("VERMELHO")) return "background:#F20909; color:white;";
-
-    // AZUIS (O específico "ESCURO" deve vir antes do geral "AZUL")
-    if (c.includes("AZUL ESCURO")) return "background:#161692; color:white;";
-    if (c.includes("AZUL METÁLICO")) return "background:#1244A7; color:white;"; // Sugestão se usar metálico no azul
-    if (c.includes("AZUL")) return "background:#5060DE; color:white;";
-
-    // OUTRAS CORES
-    if (c.includes("PRETA") || c.includes("PRETA")) return "background:#000000; color:white;";
-    if (c.includes("PRETO METÁLICO") || c.includes("PRETO METÁLICO")) return "background:#383030; color:white;";
-
-    if (c.includes("BRANCO PEROLIZADO") || c.includes("BRANCO PEROLIZADO")) return "background:#F7EFEF; color:#333; border:1px solid #ccc;";
-    if (c.includes("BRANCAS") || c.includes("BRANCA")) return "background:#FFFFFF; color:#333; border:1px solid #ccc;";
-    
-    if (c.includes("AMARELA")) return "background:#FFFF00; color:#000;";
-    if (c.includes("LARANJA")) return "background:#FF8C00; color:white;";
-    if (c.includes("PRATA")) return "background:#EEE; color:#333;";
-    if (c.includes("CINZA METÁLICO")) return "background:#A3A0A0; color:white;";
+    function obterEstiloCor(nomeCor) {
+        if (!nomeCor) return "";
+        const c = nomeCor.toUpperCase();
+        if (c.includes("VERMELHO METÁLICO")) return "background:#B00404; color:white;";
+        if (c.includes("VERMELHO PEROLIZADO")) return "background:#E93434; color:white;";
+        if (c.includes("VERMELHA") || c.includes("VERMELHO")) return "background:#F20909; color:white;";
+        if (c.includes("AZUL ESCURO")) return "background:#161692; color:white;";
+        if (c.includes("AZUL METÁLICO")) return "background:#1244A7; color:white;";
+        if (c.includes("AZUL")) return "background:#5060DE; color:white;";
+        if (c.includes("PRETA") || c.includes("PRETO")) return "background:#000000; color:white;";
+        if (c.includes("PRETO METÁLICO")) return "background:#383030; color:white;";
+        if (c.includes("BRANCO PEROLIZADO")) return "background:#F7EFEF; color:#333; border:1px solid #ccc;";
+        if (c.includes("BRANCA")) return "background:#FFFFFF; color:#333; border:1px solid #ccc;";
+        if (c.includes("AMARELA")) return "background:#FFFF00; color:#000;";
+        if (c.includes("LARANJA")) return "background:#FF8C00; color:white;";
+        if (c.includes("PRATA")) return "background:#EEE; color:#333;";
+        if (c.includes("CINZA METÁLICO")) return "background:#A3A0A0; color:white;";
         if (c.includes("CINZA")) return "background:#808080; color:white;";
-    
-    return "background:#eee; color:#333;";
-}
- 
+        return "background:#eee; color:#333;";
+    }
+
     async function buscarNoBanco() {
         const data = document.getElementById('filtro-data').value;
         try {
@@ -279,19 +292,19 @@
             entregas.forEach(e => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-    <td><b>${e.id}</b></td>
-    <td>${e.modelo}</td>
-    <td>
-        <span style="${obterEstiloCor(e.cor)} display: inline-block; padding: 5px 15px; border-radius: 8px; width: 150px; font-weight: bold; text-align: center;">
-            ${e.cor}
-        </span>
-    </td>
-    <td>${e.chassi}</td>
-    <td>${e.vendedor}</td>
-    <td>${e.cidade}</td>
-    <td>${e.obs}</td>
-    <td><button class="btn-del" onclick="deletarRegistro(${e.id})">Apagar</button></td>
-`;
+                    <td><b>${e.id}</b></td>
+                    <td>${e.modelo}</td>
+                    <td>
+                        <span style="${obterEstiloCor(e.cor)} display: inline-block; padding: 5px 15px; border-radius: 8px; width: 150px; font-weight: bold; text-align: center;">
+                            ${e.cor}
+                        </span>
+                    </td>
+                    <td>${e.chassi}</td>
+                    <td>${e.vendedor}</td>
+                    <td>${e.cidade}</td>
+                    <td>${e.obs}</td>
+                    <td><button class="btn-del" onclick="deletarRegistro(${e.id})">Apagar</button></td>
+                `;
                 tbody.appendChild(tr);
             });
         } catch(e) { console.error(e); }
@@ -307,12 +320,8 @@
         };
 
         try {
-            // Salva no Banco de Dados
             await fetch(`${API_URL}/salvar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-            
-            // Registra no Histórico CSV
             await fetch(`${API_URL}/registrar_historico`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-
             document.getElementById('chassi').value = "";
             atualizarNumeroReg(); buscarNoBanco();
         } catch (e) { alert("Erro ao salvar."); }
@@ -367,7 +376,10 @@
         if(window[id+'Inst']) window[id+'Inst'].destroy();
         window[id+'Inst'] = new Chart(ctx, {
             type: 'pie',
-            data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#cc0000', '#0000aa', '#ffff00', '#00ff00'] }] },
+            data: { 
+                labels: Object.keys(data), 
+                datasets: [{ data: Object.values(data), backgroundColor: ['#cc0000', '#0000aa', '#ffff00', '#00ff00', '#888', '#f80'] }] 
+            },
             options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: label } } }
         });
     }
