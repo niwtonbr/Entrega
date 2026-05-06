@@ -1,6 +1,5 @@
 import os
 import sqlite3
-import subprocess
 import csv 
 from datetime import datetime
 from flask import Flask, request, jsonify
@@ -9,22 +8,13 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-STORAGE_PATH = r"\\192.168.18.86\entrega"
-USER = "admin"
-PASS = "nbr#@321"
-DB_PATH = os.path.join(STORAGE_PATH, 'oficina.db')
-CSV_PATH = os.path.join(STORAGE_PATH, 'historico_entregas.csv')
-
-def autenticar_storage():
-    try:
-        comando = f'net use {STORAGE_PATH} {PASS} /user:{USER} /persistent:yes'
-        subprocess.run(comando, shell=True, capture_output=True)
-    except Exception as e:
-        print(f"Erro Storage: {e}")
+# Ajuste de Caminhos para o Render (Caminhos Relativos)
+# O Render encontrará os arquivos na mesma pasta do repositório GitHub
+DB_PATH = 'oficina.db'
+CSV_PATH = 'historico_entregas.csv'
 
 def get_db_connection():
-    if not os.path.exists(STORAGE_PATH):
-        autenticar_storage()
+    # Conecta diretamente ao arquivo na raiz do projeto
     conn = sqlite3.connect(DB_PATH, timeout=30)
     conn.row_factory = sqlite3.Row
     conn.execute('PRAGMA journal_mode=WAL;')
@@ -43,7 +33,7 @@ def proximo_reg():
     except:
         return jsonify({"proximo": 1})
 
-# Rota do Telão (Sempre limpa com o botão limpar_painel)
+# Rota do Telão
 @app.route('/get_entregas', methods=['GET'])
 def get_entregas():
     try:
@@ -60,7 +50,7 @@ def get_entregas():
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
-# Rota do Relatório (Lê o CSV - NUNCA é limpa pelo botão limpar_painel)
+# Rota do Relatório (Lê o CSV)
 @app.route('/get_historico', methods=['GET'])
 def get_historico():
     try:
@@ -112,8 +102,7 @@ def salvar():
 @app.route('/registrar_historico', methods=['POST'])
 def registrar_historico():
     try:
-        dados = request.json # Corrigido aqui (removido o callable)
-        autenticar_storage() # Garante que o caminho de rede está aberto
+        dados = request.json
         arquivo_existe = os.path.exists(CSV_PATH)
         arquivo_vazio = os.stat(CSV_PATH).st_size == 0 if arquivo_existe else True
         
@@ -130,7 +119,6 @@ def registrar_historico():
             ])
         return jsonify({"status": "sucesso"}), 201
     except Exception as e:
-        print(f"Erro CSV: {e}")
         return jsonify({"erro": str(e)}), 500
 
 @app.route('/deletar/<int:id>', methods=['DELETE'])
@@ -150,16 +138,14 @@ def limpar_painel():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        # APAGA APENAS O SQLITE (TELÃO)
         cursor.execute("DELETE FROM entregas")
         cursor.execute("DELETE FROM sqlite_sequence WHERE name='entregas'")
         conn.commit()
         conn.close()
-        # O arquivo CSV (HISTÓRICO) permanece intacto!
         return jsonify({"status": "sucesso"}), 200
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
 if __name__ == '__main__':
-    autenticar_storage()
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    # Porta padrão para o Render é a 10000, mas o Gunicorn no Start Command sobrescreve isso
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 10000)))
