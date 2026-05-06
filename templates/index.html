@@ -14,7 +14,7 @@
             --glass-border: rgba(255, 255, 255, 0.2);
             --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
             /* Estilização da Barra de Rolagem (Scrollbar) */
-::-webkit-scrollbar {
+::-webkit-scrollbar {im
     width: 15px; /* Largura da barra */
 }
 
@@ -108,7 +108,7 @@
 
 <header>
     <div class="header-left">
-        <img src="logo_honda.png" class="logo-honda" alt="Logo">
+        <img src="{{ url_for('static', filename='logo_honda.png') }}" alt="Logo Honda" width="150">
         <span class="logo-text">Tropical Motos</span>
     </div>
     <div id="relogio">00:00:00</div>
