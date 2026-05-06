@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Tropical Motos | Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --honda-red: #cc0000;
+            --honda-dark: #8b0000;
+            --bg-color: #f0f2f5;
+            --glass: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            /* Estilização da Barra de Rolagem (Scrollbar) */
+::-webkit-scrollbar {
+    width: 15px; /* Largura da barra */
+}
+
+::-webkit-scrollbar-track {
+    background: #5dc9ea; /* Cor do fundo da trilha */
+    border-radius: 15px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--honda-red); /* Cor da barra em si (mude aqui) */
+    border-radius: 10px;
+    border: 2px solid #f1f1f1; /* Cria um espaçamento ao redor da barra */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--honda-dark); /* Cor quando passa o mouse */
+}
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; 
+            background: var(--bg-color); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+        header { 
+            background: linear-gradient(135deg, var(--honda-red), var(--honda-dark));
+            color: white; 
+            padding: 12px 25px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo-honda { width: 60px; filter: brightness(0) invert(1); transition: 0.3s; }
+        .logo-text { font-family: 'Brush Script MT', cursive; font-size: 36px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        #relogio { font-family: 'Consolas', monospace; font-weight: bold; font-size: 24px; background: #000; color: #00ff00; padding: 6px 18px; border-radius: 10px; border: 2px solid #444; }
+        .dashboard { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; }
+        .col-cadastro, .col-tabela { 
+            background: var(--glass); 
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 20px; 
+            border-radius: 20px; 
+            box-shadow: var(--shadow); 
+        }
+        .col-cadastro { flex: 0 0 360px; overflow-y: auto; }
+        .col-tabela { flex: 1; display: flex; flex-direction: column; }
+        h2 { font-size: 16px; color: var(--honda-red); border-bottom: 3px solid var(--honda-red); margin-bottom: 15px; padding-bottom: 5px; text-transform: uppercase; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 11px; font-weight: bold; color: #666; margin-bottom: 5px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; }
+        input:focus, select:focus { border-color: var(--honda-red); box-shadow: 0 0 8px rgba(204, 0, 0, 0.2); }
+        .readonly-box { background: #f9f9f9; font-weight: bold; color: var(--honda-red); }
+        .btn-enviar { width: 100%; padding: 15px; background: linear-gradient(to right, #1a1a7a, #0d0d4d); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 10px; transition: 0.3s; margin-top: 10px; }
+        .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
+        .table-container { flex: 1; overflow-y: auto; margin-top: 15px; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: var(--honda-red); color: white; padding: 15px 8px; position: sticky; top: 0; text-align: center; text-transform: uppercase; }
+        td { padding: 12px 8px; border-bottom: 1px solid #eee; text-align: center; }
+        .btn-del { background: #ff4d4d; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+        .btn-relatorio { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-limpar { background: #ff8c00; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .fab-analytics {
+            position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
+            border-radius: 50%; background: var(--honda-red); color: white;
+            border: 4px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            cursor: pointer; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; z-index: 1000;
+        }
+        .analytics-panel {
+            position: fixed; top: 0; right: -100%; width: 450px; height: 100vh;
+            background: var(--glass); backdrop-filter: blur(20px);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            z-index: 1001; transition: right 0.5s;
+            display: flex; flex-direction: column; padding: 40px; border-left: 10px solid var(--honda-red);
+        }
+        .analytics-panel.open { right: 0; }
+        @media print {
+            header, .col-cadastro, .btn-del, #filtro-data, .btn-relatorio, .btn-limpar, .fab-analytics { display: none !important; }
+            .dashboard { padding: 0; }
+            .col-tabela { width: 100%; box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <img src="logo_honda.png" class="logo-honda" alt="Logo">
+        <span class="logo-text">Tropical Motos</span>
+    </div>
+    <div id="relogio">00:00:00</div>
+</header>
+
+<div class="dashboard">
+    <div class="col-cadastro">
+        <h2>Novo Registro</h2>
+        <div class="form-group"><label>Nº REGISTRO</label><input type="text" id="reg" class="readonly-box" readonly></div>
+        <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;"><label>DATA</label><input type="date" id="data"></div>
+            <div class="form-group" style="flex: 1;"><label>HORA</label><input type="time" id="hora"></div>
+        </div>
+        <div class="form-group">
+            <label>MODELO</label>
+            <select id="modelo">
+                <option value="BROS">BROS</option><option value="BIZ 125">BIZ 125</option><option value="BIZ 110I">BIZ 110I</option>
+                <option value="FAN">FAN</option><option value="TITAN">TITAN</option><option value="CB 300F">CB 300F</option>
+                <option value="XRE 300 SAHARA">XRE 300 SAHARA</option><option value="PCX">PCX</option><option value="POP 110I">POP 110I</option>
+                <option value="ELITE">ELITE</option><option value="ADV">ADV</option><option value="START">START</option>
+                <option value="CARGO">CARGO</option><option value="TWISTER 300F">TWISTER 300F</option><option value="XRE 190">XRE 190</option>
+                <option value="CRF 250F">CRF 250F</option><option value="CRF 450F">CRF 450F</option><option value="TRX 420 FOURTRAX">TRX 420 FOURTRAX</option>
+                <option value="X-ADV">X-ADV</option><option value="XR 300L TORNADO">XR 300L TORNADO</option><option value="SAHARA 300">SAHARA 300</option>
+                <option value="CRF 1100L AFRICA">CRF 1100L AFRICA</option><option value="CB 1000R">CB 1000R</option><option value="CB 650R">CB 650R</option>
+                <option value="NC 750">NC 750</option><option value="CB 500X">CB 500X</option><option value="CB 500F">CB 500F</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>COR</label>
+            <select id="cor">
+                <option value="VERMELHA">VERMELHA</option><option value="VERMELHO METÁLICO">VERMELHO METÁLICO</option>
+                <option value="VERMELHO PEROLIZADO">VERMELHO PEROLIZADO</option><option value="AZUL METÁLICO">AZUL METÁLICO</option>
+                <option value="AZUL">AZUL</option><option value="AZUL ESCURO">AZUL ESCURO</option>
+                <option value="AZUL PEROLIZADO">AZUL PEROLIZADO</option><option value="BRANCA">BRANCA</option>
+                <option value="BRANCO PEROLIZADO">BRANCO PEROLIZADO</option><option value="PRETA">PRETA</option>
+                <option value="PRETO METÁLICO">PRETO METÁLICO</option><option value="AMARELA">AMARELA</option>
+                <option value="LARANJA">LARANJA</option><option value="PRATA">PRATA</option><option value="CINZA">CINZA</option><option value="CINZA METÁLICO">CINZA METÁLICO</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>CHASSI</label>
+            <input type="text" id="chassi" maxlength="8" style="text-transform: uppercase;" placeholder="AB123456" oninput="validarChassi(this)">
+        </div>
+        <div class="form-group">
+            <label>VENDEDOR</label>
+            <select id="vendedor">
+                <option value="JOSÉ NILTON">JOSÉ NILTON</option><option value="M. CRISTINA">M. CRISTINA</option>
+                <option value="CYNTHIA">CYNTHIA</option><option value="JULY">JULY</option><option value="ROBERTA">ROBERTA</option>
+                <option value="TIAGO CG">TIAGO CG</option><option value="TIAGO CFM">TIAGO CFM</option><option value="MICHELLE">MICHELLE</option>
+                <option value="CAROLINA">CAROLINA</option><option value="GEISIMARA">GEISIMARA</option><option value="ADILMA">ADILMA</option>
+                <option value="JOYCE">JOYCE</option><option value="FABRICIA">FABRICIA</option><option value="SHEILA">SHEILA</option>
+                <option value="LUANA">LUANA</option><option value="M. CLARA">M. CLARA</option><option value="CRISLANE">CRISLANE</option>
+                <option value="TAIANE">TAIANE</option><option value="GEOVANI">GEOVANI</option>
+            </select>
+        </div>
+        <div class="form-group"><label>CIDADE</label><select id="cidade"></select></div>
+        <div class="form-group"><label>NOTA FISCAL</label><input type="text" id="nf"></div>
+        <div class="form-group"><label>OBSERVAÇÃO</label><input type="text" id="obs" value="ENTREGA IMEDIATA"></div>
+        <button class="btn-enviar" onclick="enviarDados()">ENVIAR PARA O TELÃO</button>
+    </div>
+
+    <div class="col-tabela">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="border:none; margin:0;">Motos no Painel</h2>
+            <div style="display: flex; gap: 10px;">
+                <input type="date" id="filtro-data" onchange="buscarNoBanco()" style="width: 140px; padding: 8px;">
+                <button class="btn-limpar" onclick="limparPainel()">LIMPAR TELÃO</button>
+                <button class="btn-relatorio" onclick="window.print()">RELATÓRIO</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="tabela">
+                <thead>
+                    <tr>
+                        <th style="width:50px">REG</th><th>MODELO</th><th>COR</th><th>CHASSI</th><th>VENDEDOR</th><th>CIDADE</th><th>OBSERVAÇÃO</th><th>AÇÕES</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="fab-analytics" onclick="toggleAnalytics()">
+    <span style="font-size: 24px;">📊</span>
+    <span style="font-size: 10px;">ANÁLISE</span>
+</div>
+
+<div class="analytics-panel" id="analyticsPanel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <h2 style="border:none;">Dashboard</h2>
+        <button onclick="toggleAnalytics()">X</button>
+    </div>
+    <div style="height: 200px; margin-bottom: 20px;"><canvas id="chartModelos"></canvas></div>
+    <div style="height: 200px;"><canvas id="chartVendedores"></canvas></div>
+</div>
+
+<script>
+    const API_URL = "http://127.0.0.1:5000";
+    let modelosChart, vendedoresChart;
+
+    function validarChassi(input) {
+        let valor = input.value.toUpperCase();
+        let filtrado = "";
+        for (let i = 0; i < valor.length; i++) {
+            if (i < 2) { if (/[A-Z]/.test(valor[i])) filtrado += valor[i]; }
+            else { if (/[0-9]/.test(valor[i])) filtrado += valor[i]; }
+        }
+        input.value = filtrado;
+    }
+
+    async function carregarCidades() {
+        try {
+            const response = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados/29/municipios");
+            const cidades = await response.json();
+            const select = document.getElementById("cidade");
+            cidades.sort((a, b) => a.nome.localeCompare(b.nome)).forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = opt.textContent = c.nome.toUpperCase();
+                if(opt.value === "SENHOR DO BONFIM") opt.selected = true;
+                select.appendChild(opt);
+            });
+        } catch (e) { console.error(e); }
+    }
+
+   function obterEstiloCor(nomeCor) {
+    if (!nomeCor) return "";
+    const c = nomeCor.toUpperCase();
+    
+    // VERMELHOS (O específico "METÁLICO" deve vir antes do geral "VERMELHA")
+    if (c.includes("VERMELHO METÁLICO")) return "background:#B00404; color:white;";
+    if (c.includes("VERMELHO PEROLIZADO")) return "background:#E93434; color:white;";
+    if (c.includes("VERMELHA") || c.includes("VERMELHO")) return "background:#F20909; color:white;";
+
+    // AZUIS (O específico "ESCURO" deve vir antes do geral "AZUL")
+    if (c.includes("AZUL ESCURO")) return "background:#161692; color:white;";
+    if (c.includes("AZUL METÁLICO")) return "background:#1244A7; color:white;"; // Sugestão se usar metálico no azul
+    if (c.includes("AZUL")) return "background:#5060DE; color:white;";
+
+    // OUTRAS CORES
+    if (c.includes("PRETA") || c.includes("PRETA")) return "background:#000000; color:white;";
+    if (c.includes("PRETO METÁLICO") || c.includes("PRETO METÁLICO")) return "background:#383030; color:white;";
+
+    if (c.includes("BRANCO PEROLIZADO") || c.includes("BRANCO PEROLIZADO")) return "background:#F7EFEF; color:#333; border:1px solid #ccc;";
+    if (c.includes("BRANCAS") || c.includes("BRANCA")) return "background:#FFFFFF; color:#333; border:1px solid #ccc;";
+    
+    if (c.includes("AMARELA")) return "background:#FFFF00; color:#000;";
+    if (c.includes("LARANJA")) return "background:#FF8C00; color:white;";
+    if (c.includes("PRATA")) return "background:#EEE; color:#333;";
+    if (c.includes("CINZA METÁLICO")) return "background:#A3A0A0; color:white;";
+        if (c.includes("CINZA")) return "background:#808080; color:white;";
+    
+    return "background:#eee; color:#333;";
+}
+ 
+    async function buscarNoBanco() {
+        const data = document.getElementById('filtro-data').value;
+        try {
+            const res = await fetch(`${API_URL}/get_entregas?data=${data}`);
+            const entregas = await res.json();
+            const tbody = document.querySelector("#tabela tbody");
+            tbody.innerHTML = "";
+            entregas.forEach(e => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+    <td><b>${e.id}</b></td>
+    <td>${e.modelo}</td>
+    <td>
+        <span style="${obterEstiloCor(e.cor)} display: inline-block; padding: 5px 15px; border-radius: 8px; width: 150px; font-weight: bold; text-align: center;">
+            ${e.cor}
+        </span>
+    </td>
+    <td>${e.chassi}</td>
+    <td>${e.vendedor}</td>
+    <td>${e.cidade}</td>
+    <td>${e.obs}</td>
+    <td><button class="btn-del" onclick="deletarRegistro(${e.id})">Apagar</button></td>
+`;
+                tbody.appendChild(tr);
+            });
+        } catch(e) { console.error(e); }
+    }
+
+    async function enviarDados() {
+        const payload = {
+            nf: document.getElementById('nf').value, data: document.getElementById('data').value,
+            hora: document.getElementById('hora').value, modelo: document.getElementById('modelo').value,
+            cor: document.getElementById('cor').value, chassi: document.getElementById('chassi').value.toUpperCase(), 
+            vendedor: document.getElementById('vendedor').value, cidade: document.getElementById('cidade').value,
+            obs: document.getElementById('obs').value
+        };
+
+        try {
+            // Salva no Banco de Dados
+            await fetch(`${API_URL}/salvar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            
+            // Registra no Histórico CSV
+            await fetch(`${API_URL}/registrar_historico`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+
+            document.getElementById('chassi').value = "";
+            atualizarNumeroReg(); buscarNoBanco();
+        } catch (e) { alert("Erro ao salvar."); }
+    }
+
+    async function deletarRegistro(id) {
+        if(confirm("Deseja apagar?")) { await fetch(`${API_URL}/deletar/${id}`, {method:'DELETE'}); buscarNoBanco(); atualizarNumeroReg(); }
+    }
+
+    async function limparPainel() {
+        if(confirm("Limpar todo o telão?")) { await fetch(`${API_URL}/limpar_painel`, { method: 'POST' }); buscarNoBanco(); atualizarNumeroReg(); }
+    }
+
+    async function atualizarNumeroReg() {
+        try {
+            const res = await fetch(`${API_URL}/proximo_reg`);
+            const data = await res.json();
+            document.getElementById('reg').value = data.proximo;
+        } catch(e) { console.error(e); }
+    }
+
+    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR'); }, 1000);
+
+    window.onload = () => {
+        const hoje = new Date().toISOString().split('T')[0];
+        document.getElementById('data').value = document.getElementById('filtro-data').value = hoje;
+        document.getElementById('hora').value = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+        carregarCidades(); atualizarNumeroReg(); buscarNoBanco();
+    };
+
+    function toggleAnalytics() {
+        document.getElementById('analyticsPanel').classList.toggle('open');
+        if(document.getElementById('analyticsPanel').classList.contains('open')) loadChartsData();
+    }
+
+    async function loadChartsData() {
+        try {
+            const res = await fetch(`${API_URL}/get_entregas?data=`);
+            const entregas = await res.json();
+            const modCount = {}, venCount = {};
+            entregas.forEach(e => {
+                modCount[e.modelo] = (modCount[e.modelo] || 0) + 1;
+                venCount[e.vendedor] = (venCount[e.vendedor] || 0) + 1;
+            });
+            renderChart('chartModelos', modCount, 'Modelos');
+            renderChart('chartVendedores', venCount, 'Vendedores');
+        } catch (e) { console.error(e); }
+    }
+
+    function renderChart(id, data, label) {
+        const ctx = document.getElementById(id).getContext('2d');
+        if(window[id+'Inst']) window[id+'Inst'].destroy();
+        window[id+'Inst'] = new Chart(ctx, {
+            type: 'pie',
+            data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#cc0000', '#0000aa', '#ffff00', '#00ff00'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: label } } }
+        });
+    }
+</script>
+</body>
+</html>
