@@ -2,19 +2,29 @@ import os
 import sqlite3
 import csv 
 from datetime import datetime
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template  # Adicionado render_template
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
-# Ajuste de Caminhos para o Render (Caminhos Relativos)
-# O Render encontrará os arquivos na mesma pasta do repositório GitHub
+# Ajuste de Caminhos para o Render
 DB_PATH = 'oficina.db'
 CSV_PATH = 'historico_entregas.csv'
 
+# --- NOVA ROTA PRINCIPAL ---
+@app.route('/')
+def home():
+    # Isso busca automaticamente o arquivo dentro da pasta /templates
+    return render_template('index.html')
+
+@app.route('/relatorio')
+def relatorio_page():
+    # Rota para abrir a página de relatórios
+    return render_template('relatorios.html')
+# ---------------------------
+
 def get_db_connection():
-    # Conecta diretamente ao arquivo na raiz do projeto
     conn = sqlite3.connect(DB_PATH, timeout=30)
     conn.row_factory = sqlite3.Row
     conn.execute('PRAGMA journal_mode=WAL;')
@@ -33,7 +43,6 @@ def proximo_reg():
     except:
         return jsonify({"proximo": 1})
 
-# Rota do Telão
 @app.route('/get_entregas', methods=['GET'])
 def get_entregas():
     try:
@@ -50,7 +59,6 @@ def get_entregas():
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
-# Rota do Relatório (Lê o CSV)
 @app.route('/get_historico', methods=['GET'])
 def get_historico():
     try:
@@ -147,5 +155,4 @@ def limpar_painel():
         return jsonify({"erro": str(e)}), 500
 
 if __name__ == '__main__':
-    # Porta padrão para o Render é a 10000, mas o Gunicorn no Start Command sobrescreve isso
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 10000)))
