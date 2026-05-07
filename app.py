@@ -1,27 +1,35 @@
 import os
-import sqlite3
 import csv 
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template 
 from flask_cors import CORS
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
 CORS(app)
 
-# --- CORREÇÃO 1: CAMINHOS ABSOLUTOS ---
-# Isso evita que o Render se perca ao tentar gravar arquivos
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'oficina.db')
-CSV_PATH = os.path.join(BASE_DIR, 'historico_entregas.csv')
+# --- CONFIGURAÇÃO DO BANCO DE DADOS (POSTGRESQL) ---
+# O Render fornece a variável DATABASE_URL automaticamente
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
-# --- CORREÇÃO 2: CRIAÇÃO AUTOMÁTICA DO BANCO ---
-# Se o banco não existir no Render, os botões de enviar vão dar erro 500.
+def get_db_connection():
+    # Se estiver local, usa o sqlite (simples), se estiver no render, usa postgres
+    if DATABASE_URL:
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        return conn
+    else:
+        # Fallback para desenvolvimento local (simulando SQLite via Postgres ou similar)
+        # Para simplificar, assumimos que no Render a URL existirá.
+        raise Exception("DATABASE_URL não configurada no ambiente.")
+
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    # Criação da tabela de Entregas (Painel)
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS entregas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             num TEXT,
             data TEXT,
             hora TEXT,
@@ -31,12 +39,33 @@ def init_db():
             vendedor TEXT,
             cidade TEXT,
             obs TEXT
-        )
+        );
+    """)
+    # Criação da tabela de Histórico (Substituindo o CSV que sumia no Render)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS historico (
+            id SERIAL PRIMARY KEY,
+            hora_sistema TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            nf TEXT,
+            data_entrega TEXT,
+            hora TEXT,
+            modelo TEXT,
+            cor TEXT,
+            chassi TEXT,
+            vendedor TEXT,
+            cidade TEXT,
+            obs TEXT
+        );
     """)
     conn.commit()
+    cur.close()
     conn.close()
 
-init_db() # Executa ao iniciar o app
+# Inicializa o banco ao subir o app
+try:
+    init_db()
+except Exception as e:
+    print(f"Erro ao iniciar banco: {e}")
 
 @app.route('/')
 def home():
@@ -46,24 +75,17 @@ def home():
 def relatorio_page():
     return render_template('relatorios.html')
 
-def get_db_connection():
-    conn = sqlite3.connect(DB_PATH, timeout=30)
-    conn.row_factory = sqlite3.Row
-    # WAL mode é excelente para nuvem (evita Database is locked)
-    conn.execute('PRAGMA journal_mode=WAL;')
-    conn.execute('PRAGMA synchronous=NORMAL;')
-    return conn
-
 @app.route('/proximo_reg', methods=['GET'])
 def proximo_reg():
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT MAX(id) FROM entregas")
-        resultado = cursor.fetchone()[0]
+        cur = conn.cursor()
+        cur.execute("SELECT MAX(id) FROM entregas")
+        res = cur.fetchone()[0]
+        cur.close()
         conn.close()
-        return jsonify({"proximo": (resultado + 1) if resultado else 1})
-    except:
+        return jsonify({"proximo": (res + 1) if res else 1})
+    except Exception as e:
         return jsonify({"proximo": 1})
 
 @app.route('/get_entregas', methods=['GET'])
@@ -71,14 +93,15 @@ def get_entregas():
     try:
         data_sel = request.args.get('data')
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
         if data_sel and data_sel.strip() != "":
-            cursor.execute("SELECT * FROM entregas WHERE data = ?", (data_sel,))
+            cur.execute("SELECT * FROM entregas WHERE data = %s", (data_sel,))
         else:
-            cursor.execute("SELECT * FROM entregas")
-        rows = cursor.fetchall()
+            cur.execute("SELECT * FROM entregas")
+        rows = cur.fetchall()
+        cur.close()
         conn.close()
-        return jsonify([dict(ix) for ix in rows])
+        return jsonify(rows)
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
@@ -89,25 +112,27 @@ def get_historico():
         ano_filtro = request.args.get('ano') 
         dia_filtro = request.args.get('dia') 
 
-        if not os.path.exists(CSV_PATH):
-            return jsonify([])
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        
+        query = "SELECT vendedor, modelo, cor, cidade, data_entrega as data FROM historico WHERE 1=1"
+        params = []
 
-        historico = []
-        with open(CSV_PATH, mode='r', encoding='utf-8-sig') as file:
-            leitor = csv.DictReader(file, delimiter=';')
-            for linha in leitor:
-                data_entrega = linha.get('DATA_ENTREGA', '') 
-                if ano_filtro and ano_filtro not in data_entrega: continue
-                if mes_filtro and (len(data_entrega) < 7 or data_entrega[5:7] != mes_filtro): continue
-                if dia_filtro and data_entrega != dia_filtro: continue
+        if ano_filtro:
+            query += " AND data_entrega LIKE %s"
+            params.append(f"%{ano_filtro}%")
+        if mes_filtro:
+            # Ajuste simples para busca de mês em string
+            query += " AND data_entrega LIKE %s"
+            params.append(f"%/{mes_filtro}/%")
+        if dia_filtro:
+            query += " AND data_entrega = %s"
+            params.append(dia_filtro)
 
-                historico.append({
-                    "vendedor": linha.get('VENDEDOR', ''),
-                    "modelo": linha.get('MODELO', ''),
-                    "cor": linha.get('COR', ''),
-                    "cidade": linha.get('CIDADE', ''),
-                    "data": data_entrega
-                })
+        cur.execute(query, params)
+        historico = cur.fetchall()
+        cur.close()
+        conn.close()
         return jsonify(historico)
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
@@ -117,14 +142,15 @@ def salvar():
     try:
         dados = request.json
         conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
+        cur = conn.cursor()
+        cur.execute("""
             INSERT INTO entregas (num, data, hora, modelo, cor, chassi, vendedor, cidade, obs)
-            VALUES (?,?,?,?,?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """, (dados.get('nf',''), dados.get('data',''), dados.get('hora',''), 
               dados.get('modelo',''), dados.get('cor',''), dados.get('chassi',''), 
               dados.get('vendedor',''), dados.get('cidade',''), dados.get('obs','')))
         conn.commit()
+        cur.close()
         conn.close()
         return jsonify({"status": "sucesso"}), 201
     except Exception as e:
@@ -134,21 +160,17 @@ def salvar():
 def registrar_historico():
     try:
         dados = request.json
-        arquivo_existe = os.path.exists(CSV_PATH)
-        # CORREÇÃO 3: Verificação de arquivo vazio mais robusta
-        arquivo_vazio = not arquivo_existe or os.stat(CSV_PATH).st_size == 0
-        
-        with open(CSV_PATH, mode='a', newline='', encoding='utf-8-sig') as file:
-            escritor = csv.writer(file, delimiter=';')
-            if arquivo_vazio:
-                escritor.writerow(['HORA_SISTEMA', 'NF', 'DATA_ENTREGA', 'HORA', 'MODELO', 'COR', 'CHASSI', 'VENDEDOR', 'CIDADE', 'OBS'])
-            
-            escritor.writerow([
-                datetime.now().strftime('%d/%m/%Y %H:%M:%S'),
-                dados.get('nf', ''), dados.get('data', ''), dados.get('hora', ''), 
-                dados.get('modelo', ''), dados.get('cor', ''), dados.get('chassi', ''), 
-                dados.get('vendedor', ''), dados.get('cidade', ''), dados.get('obs', '')
-            ])
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO historico (nf, data_entrega, hora, modelo, cor, chassi, vendedor, cidade, obs)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (dados.get('nf', ''), dados.get('data', ''), dados.get('hora', ''), 
+              dados.get('modelo', ''), dados.get('cor', ''), dados.get('chassi', ''), 
+              dados.get('vendedor', ''), dados.get('cidade', ''), dados.get('obs', '')))
+        conn.commit()
+        cur.close()
+        conn.close()
         return jsonify({"status": "sucesso"}), 201
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
@@ -157,9 +179,10 @@ def registrar_historico():
 def deletar_entrega(id):
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM entregas WHERE id = ?", (id,))
+        cur = conn.cursor()
+        cur.execute("DELETE FROM entregas WHERE id = %s", (id,))
         conn.commit()
+        cur.close()
         conn.close()
         return jsonify({"status": "sucesso"}), 200
     except Exception as e:
@@ -169,16 +192,15 @@ def deletar_entrega(id):
 def limpar_painel():
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM entregas")
-        cursor.execute("DELETE FROM sqlite_sequence WHERE name='entregas'")
+        cur = conn.cursor()
+        cur.execute("DELETE FROM entregas")
         conn.commit()
+        cur.close()
         conn.close()
         return jsonify({"status": "sucesso"}), 200
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
 if __name__ == '__main__':
-    # CORREÇÃO 4: Porta dinâmica para o Render
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
