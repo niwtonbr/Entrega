@@ -1,227 +1,321 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Painel de Controle | Tropical Motos</title>
+    <title>Central de Manutenção | Tropical Motos</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --honda-red: #cc0000;
             --honda-blue: #0723f9;
-            --bg-dark: #0f0f0f;
-            --card-bg: #1a1a1a;
+            --bg-dark: #0a0a0a;
+            --card-bg: #151515;
             --text-white: #ffffff;
-            --text-gray: #b0b0b0;
+            --text-gray: #a0a0a0;
             --neon-green: #39FF14;
+            --neon-yellow: #ffff00;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: var(--bg-dark); 
             color: var(--text-white);
-            padding: 40px;
+            padding: 40px 20px;
+            line-height: 1.6;
         }
         header { 
             text-align: center; 
+            margin-bottom: 60px; 
+            border-bottom: 3px solid var(--honda-red);
+            padding-bottom: 30px;
+        }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 38px; color: var(--honda-red); text-transform: uppercase; letter-spacing: 3px; }
+        .subtitle { color: var(--text-gray); font-size: 18px; margin-top: 10px; }
+
+        .nav-container { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
             margin-bottom: 50px; 
-            border-bottom: 2px solid var(--honda-red);
-            padding-bottom: 20px;
         }
-        h1 { font-family: 'Orbitron', sans-serif; font-size: 32px; color: var(--honda-red); }
-        
-        .grid-container { 
+        .nav-btn { 
+            color: white; text-decoration: none; padding: 12px 25px; 
+            border: 1px solid var(--honda-red); border-radius: 10px; 
+            font-family: 'Orbitron'; font-size: 12px; transition: 0.3s;
+        }
+        .nav-btn:hover { background: var(--honda-red); box-shadow: 0 0 15px var(--honda-red); }
+
+        .main-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
-            gap: 25px; 
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
+            gap: 30px; 
+            max-width: 1600px; 
+            margin: 0 auto;
         }
-        .section-card { 
+        .doc-card { 
             background: var(--card-bg); 
             border: 1px solid #333; 
-            border-radius: 20px; 
-            padding: 25px; 
-            transition: 0.3s;
+            border-radius: 25px; 
+            padding: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .section-card:hover { border-color: var(--honda-red); transform: translateY(-5px); }
-        .section-card h2 { font-family: 'Orbitron', sans-serif; color: var(--honda-red); margin-bottom: 20px; font-size: 20px; }
-        
-        .item-guide { 
-            background: rgba(0,0,0,0.3); 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 15px; 
-            border-left: 4px solid var(--honda-blue);
-        }
-        .item-guide b { color: var(--neon-green); font-family: 'Orbitron'; font-size: 13px; }
-        .item-guide p { font-size: 14px; color: var(--text-gray); margin-top: 5px; }
-        
-        .code-snippet { 
-            background: #000; 
-            color: #00ff00; 
-            padding: 10px; 
-            font-family: 'Consolas', monospace; 
-            font-size: 12px; 
-            border-radius: 5px; 
-            margin-top: 10px; 
-            overflow-x: auto; 
-            display: block;
-            border: 1px solid #333;
+        .doc-card h2 { 
+            font-family: 'Orbitron', sans-serif; 
+            color: var(--honda-red); 
+            margin-bottom: 25px; 
+            font-size: 22px; 
+            border-bottom: 1px solid #333; 
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .color-box { 
-            display: inline-block; 
-            width: 15px; height: 15px; 
-            border-radius: 3px; 
-            margin-right: 5px; 
+        .guide-item { 
+            background: rgba(0,0,0,0.4); 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            border-left: 4px solid var(--honda-blue);
+        }
+        .guide-item b { 
+            color: var(--neon-green); 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 14px; 
+            display: block; 
+            margin-bottom: 5px;
+        }
+        .guide-item p { 
+            font-size: 14px; 
+            color: var(--text-gray); 
+            margin-bottom: 10px;
+        }
+        .code-block { 
+            background: #000; 
+            color: #00ff00; 
+            padding: 12px; 
+            font-family: 'Consolas', monospace; 
+            font-size: 13px; 
+            border-radius: 8px; 
+            border: 1px solid #222;
+            white-space: pre-wrap;
+            display: block;
+            line-height: 1.4;
+        }
+
+        .tag {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #333;
+            color: var(--neon-yellow);
+            margin-left: 5px;
             vertical-align: middle;
         }
 
-        .nav-links { 
-            display: flex; 
-            justify-content: center; 
-            gap: 20px; 
-            margin-bottom: 40px; 
+        .important {
+            background: rgba(204, 0, 0, 0.1);
+            border-left: 4px solid var(--honda-red);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #ffcccc;
         }
-        .nav-links a { 
-            color: white; 
-            text-decoration: none; 
-            padding: 10px 20px; 
-            border: 1px solid var(--honda-red); 
-            border-radius: 8px; 
-            font-family: 'Orbitron'; 
-            font-size: 12px;
-            transition: 0.3s;
-        }
-        .nav-links a:hover { background: var(--honda-red); }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>MANUAL DE MANUTENÇÃO TROPICAL MOTOS</h1>
-    <p>Guia técnico para alteração de cores, funções e estética</p>
+    <h1>CENTRAL de MANUTENÇÃO TÉCNICA</h1>
+    <p class="subtitle">Guia de Alteração de Cores, Estética e Funcionalidades</p>
 </header>
 
-<div class="nav-links">
-    <a href="/" target="_blank">Ir para Painel ➔</a>
-    <a href="/relatorio" target="_blank">Ir para Relatórios ➔</a>
+<div class="nav-container">
+    <div class="nav-links">
+        <a href="/" target="_blank" class="nav-btn">SISTEMA (INDEX) ➔</a>
+        <a href="/relatorio" target="_blank" class="nav-btn">RELATÓRIOS ➔</a>
+    </div>
 </div>
 
-<div class="grid-container">
+<div class="main-grid">
     
-    <!-- SEÇÃO 1: CORES E ESTÉTICA GERAL -->
-    <div class="section-card">
-        <h2>🎨 Cores e Estética (CSS)</h2>
+    <!-- COLUNA 1: ESTÉTICA GLOBAL -->
+    <div class="doc-card">
+        <h2>🎨 Identidade Visual (CSS)</h2>
+        
         <div class="item-guide">
-            <b>Variáveis Globais (:root)</b>
-            <p>Para mudar as cores de todo o site, altere os valores no topo do CSS:</p>
-            <div class="code-snippet">
-                --honda-red: #cc0000; <br>
-                --neon-green: #39FF14; <br>
-                --bg-dark: #0f0f0f;
+            <b>Cores Globais <span class="tag">Variáveis</span></b>
+            <p>Para alterar a cor principal do site, mude as variáveis no topo do CSS do <code>index.html</code> e <code>relatorios.html</code>.</p>
+            <div class="code-block">
+--honda-red: #cc0000; (Vermelho Principal)
+--honda-blue: #0723f9; (Azul Detalhes)
+--bg-dark: #0a0a0a; (Fundo Escuro)
+--neon-green: #39FF14; (Verde Neon)
             </div>
         </div>
+
         <div class="item-guide">
-            <b>Animação de Flutuar (Logo/Botões)</b>
-            <p>Altere a altura do movimento no @keyframes float:</p>
-            <div class="code-snippet">
-                50% { transform: translateY(-10px); }
+            <b>Animação de Flutuar (Logo e Botões)</b>
+            <p>Altere a altura do movimento (Y) no <code>@keyframes float</code>.</p>
+            <div class="code-block">
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); } /* Menor = menos movimento */
+}
             </div>
         </div>
+
         <div class="item-guide">
-            <b>Efeito Glassmorphism (Vidro)</b>
-            <p>Altere a transparência e o desfoque nos cards:</p>
-            <div class="code-snippet">
-                backdrop-filter: blur(20px); <br>
-                background: rgba(20, 20, 20, 0.7);
+            <b>Efeito de Vidro (Glassmorphism)</b>
+            <p>Para deixar os cards mais transparentes ou mais own-blur (desfoque):</p>
+            <div class="code-block">
+backdrop-filter: blur(20px); 
+background: rgba(20, 20, 20, 0.7);
             </div>
         </div>
     </div>
 
-    <!-- SEÇÃO 2: INDEX.HTML (CADASTRO) -->
-    <div class="section-card">
-        <h2>📝 index.html (Cadastro)</h2>
+    <!-- COLUNA 2: INDEX.HTML -->
+    <div class="doc-card">
+        <h2>📝 Tela de Cadastro (index.html)</h2>
+        
         <div class="item-guide">
-            <b>Botão Enviar (Aparência)</b>
-            <p>Altere a cor do gradiente na classe <code>.btn-enviar</code>.</p>
-        </div>
-        <div class="item-guide">
-            <b>Campos do Formulário</b>
-            <p>Para adicionar novas opções de modelos ou cores, altere as tags <code>&lt;option&gt;</code> dentro dos <code>&lt;select&gt;</code>.</p>
-        </div>
-        <div class="item-guide">
-            <b>Função de Envio (JS)</b>
-            <p>A função <code>enviarDados()</code> controla o envio para o servidor e a limpeza dos campos.</p>
-            <div class="code-snippet">
-                fetch(`${API_URL}/salvar` ...)
+            <b>Adicionar Novo Modelo de Moto</b>
+            <p>Procure pela tag <code>&lt;select id="modelo"&gt;</code> e adicione uma nova opção:</p>
+            <div class="code-block">
+&lt;option value="NOVO MODELO"&gt;NOME DO MODELO&lt;/option&gt;
             </div>
         </div>
+
         <div class="item-guide">
-            <b>Sincronização do Telão</b>
-            <p>Altere o tempo de atualização automática no final do script:</p>
-            <div class="code-snippet">
-                setInterval(buscarNoBanco, 30000); // 30 seg
+            <b>Adicionar Novo Vendedor</b>
+            <p>Procure pela tag <code>&lt;select id="vendedor"&gt;</code> e adicione o nome:</p>
+            <div class="code-block">
+&lt;option value="NOME DO VENDEDOR"&gt;NOME DO VENDEDOR&lt;/option&gt;
+            </div>
+        </div>
+
+        <div class="item-guide">
+            <b>Botão de Enviar (Cores e Texto)</b>
+            <p>Altere a classe <code>.btn-enviar</code> para mudar a cor do gradiente e o texto dentro da tag <code>&lt;button&gt;</code>.</p>
+        </div>
+
+        <div class="item-guide">
+            <b>Atualização do Telão (Sincronismo)</b>
+            <p>No final do script, altere o tempo de atualização (em milissegundos):</p>
+            <div class="code-block">
+setInterval(buscarNoBanco, 30000); // 30000 = 30 segundos
             </div>
         </div>
     </div>
 
-    <!-- SEÇÃO 3: RELATORIOS.HTML (SISTEMA) -->
-    <div class="section-card">
-        <h2>📊 relatorios.html (Analytics)</h2>
-        <div class="item-//guide">
-            <b>Cores dos Gráficos</b>
-            <p>As cores das barras e pizza ficam na função <code>renderCharts</code>, dentro do array <code>colors</code>.</p>
-            <div class="code-snippet">
-                const colors = ['#FF0055', '#00FFCC', ...];
-            </div>
-        </div>
+    <!-- COLUNA 3: RELATORIOS.HTML -->
+    <div class="doc-card">
+        <h2>📊 Relatórios (relatorios.html)</h2>
+        
         <div class="item-guide">
             <b>Top 3 Destaques (KPIs)</b>
-            <p>Para mudar a quantidade de destaques, altere o <code>.slice(0, 3)</code> na função <code>processarDados</code>.</p>
+            <p>Para mudar de Top 3 para Top 5, procure a função <code>processarDados</code> e altere o slice:</p>
+            <div class="code-block">
+.slice(0, 3); // Mude o 3 para 5
+            </div>
         </div>
+
         <div class="item-guide">
-            <b>Scroll da Tabela (Altura)</b>
-            <p>Para a tabela ficar mais comprida ou curta, altere o <code>max-height</code> da <code>.scroll-area</code>.</p>
-            <div class="code-snippet">
-                max-height: 450px;
+            <b>Cores dos Gráficos (Barras e Pizza)</b>
+            <p>No final do código, procure pela constante <code>colors</code> e troque os códigos HEX:</p>
+            <div class="code-block">
+const colors = ['#FF0055', '#00FFCC', ...];
+            </div>
+        </div>
+
+        <div class="item-guide">
+            <b>Altura da Tabela (Scroll)</b>
+            <p>Para a tabela de ranking ficar maior ou menor, altere o <code>max-height</code> da <code>.scroll-area</code>:</p>
+            <div class="code-block">
+.scroll-area { max-height: 450px; }
             </div>
         </div>
     </div>
 
-    <!-- SEÇÃO 4: APP.PY E BANCO DE DADOS -->
-    <div class="section-card">
-        <h2>⚙️ app.py (Backend)</h2>
+    <!-- COLUNA 4: APP.PY -->
+    <div class="doc-card">
+        <h2>⚙️ Servidor (app.py)</h2>
+        
         <div class="item-guide">
-            <b>Conexão com Banco (PostgreSQL)</b>
-            <p>A conexão é feita via variável de ambiente <code>DATABASE_URL</code> do Render.</p>
+            <b>Mudar o Nome do Banco de Dados</b>
+            <p>O banco é gerenciado pelo Render via variável de ambiente. Para mudar a tabela, altere a função <code>init_db()</code>.</p>
         </div>
+
         <div class="item-guide">
-            <b>Rotas da API (End-points)</b>
-            <p>Cada função <code>@app.route</code> é um comando. Se quiser mudar o nome do link, altere o caminho.</p>
-            <div class="code-snippet">
-                /get_historico -> Alimenta relatórios <br>
-                /salvar -> Salva moto no telão
+            <b>Adicionar Novo Campo (Ex: Telefone)</b>
+            <p>Você deve fazer 3 passos:</p>
+            <div class="code-block">
+            1. Adicionar coluna no SQL (init_db)<br>
+            2. Adicionar input no HTML (index.html)<br>
+            3. Adicionar campo no INSERT (função salvar)
             </div>
         </div>
+
         <div class="item-guide">
-            <b>Estrutura da Tabela (SQL)</b>
-            <p>Para adicionar novas colunas (ex: Telefone do cliente), altere a função <code>init_db()</code>.</p>
+            <b>Rotas de Acesso (URLs)</b>
+            <p>Para mudar o endereço de uma página, altere o <code>@app.route</code>:</p>
+            <div class="code-block">
+@app.route('/admin') -> muda para '/gerencia'
+            </div>
         </div>
     </div>
 
-    <!-- SEÇÃO 5: INFRAESTRUTURA (RENDER/GITHUB) -->
-    <div class="section-card">
-        <h2>☁️ Render & GitHub</h2>
+    <!-- COLUNA 5: TELÃO LINUX -->
+    <div class="doc-card">
+        <h2>📺 Telão Linux Mint (Python)</h2>
+        
         <div class="item-guide">
-            <b>Dependências (requirements.txt)</b>
-            <p>Sempre que instalar uma biblioteca nova no Python, adicione o nome dela neste arquivo.</p>
-        </div>
-        <div class="item-guide">
-            <b>Comando de Partida (Start Command)</b>
-            <p>Configurado no painel do Render para ligar o site:</p>
-            <div class="code-snippet">
-                gunicorn app:app
+            <b>Sincronização com Site</b>
+            <p>Altere a URL no topo do script do telão se mudar o domínio do Render:</p>
+            <div class="code-block">
+API_URL = "https://seusite.onrender.com"
             </div>
+        </div>
+
+        <div class="item-guide">
+            <b>Cores das Linhas (Cores de Motos)</b>
+            <p>Procure pelo dicionário <code>mapa_cores</code>. Você pode alterar o texto da esquerda e a cor da direita.</p>
+            <div class="code-block">
+"AZUL": ("white", "#0000FF"),
+# ("Cor da Letra", "Cor do Fundo")
+            </div>
+        </div>
+
+        <div class="item-guide">
+            <b>Tempo de Atualização</b>
+            <p>No final do código, altere o tempo do <code>after</code>:</p>
+            <div class="code-block">
+self.root.after(10000, self.loop) // 10 seg
+            </div>
+        </div>
+    </div>
+
+    <!-- COLUNA 6: INFRAESTRUTURA -->
+    <div class="doc-card">
+        <h2>☁️ Nuvem (Render / GitHub)</h2>
+        
+        <div class="item-guide">
+            <b>Instalar Nova Biblioteca</b>
+            <p>Sempre adicione o nome da biblioteca no arquivo <code>requirements.txt</code> na raiz do GitHub.</p>
+        </div>
+
+        <div class="item-guide">
+            <b>Comando de Inicialização</b>
+            <p>No painel Render $\rightarrow$ Settings $\rightarrow$ Start Command:</p>
+            <div class="code-block">
+gunicorn app:app
+            </div>
+        </div>
+        
+        <div class="important">
+            <b>DICA DE OURO:</b> Sempre que alterar o <code>app.py</code> ou <code>requirements.txt</code>, faça o <b>Manual Deploy $\rightarrow$ Clear Cache and Deploy</b> para evitar erros de cache.
         </div>
     </div>
 </div>
