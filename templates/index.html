@@ -58,7 +58,6 @@
 
         .header-left { display: flex; align-items: center; gap: 15px; }
 
-        /* LOGO AJUSTADA: Branca e Menor */
         .logo-honda { 
             width: 42px !important; 
             height: auto;
@@ -134,7 +133,6 @@
 
 <header>
     <div class="header-left">
-        <!-- Removido o width fixo para o CSS controlar -->
         <img src="{{ url_for('static', filename='logo_honda.png') }}" alt="Logo Honda" class="logo-honda">
         <span class="logo-text">Tropical Motos</span>
     </div>
@@ -234,7 +232,8 @@
 </div>
 
 <script>
-    const API_URL = "http://127.0.0.1:5000";
+    /* CORREÇÃO 1: API_URL VAZIA PARA FUNCIONAR NA NUVEM */
+    const API_URL = ""; 
     let modelosChart, vendedoresChart;
 
     function validarChassi(input) {
@@ -310,6 +309,7 @@
         } catch(e) { console.error(e); }
     }
 
+    /* CORREÇÃO 2: FUNÇÃO ENVIAR DADOS COM REDIRECIONAMENTO */
     async function enviarDados() {
         const payload = {
             nf: document.getElementById('nf').value, data: document.getElementById('data').value,
@@ -320,11 +320,19 @@
         };
 
         try {
-            await fetch(`${API_URL}/salvar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-            await fetch(`${API_URL}/registrar_historico`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-            document.getElementById('chassi').value = "";
-            atualizarNumeroReg(); buscarNoBanco();
-        } catch (e) { alert("Erro ao salvar."); }
+            const resSalvar = await fetch(`${API_URL}/salvar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            const resHist = await fetch(`${API_URL}/registrar_historico`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            
+            if (resSalvar.ok && resHist.ok) {
+                alert("Registro enviado com sucesso!");
+                // REDIRECIONA PARA O RELATÓRIO
+                window.location.href = '/relatorio';
+            } else {
+                alert("Erro ao salvar dados no servidor.");
+            }
+        } catch (e) { 
+            alert("Erro de conexão com o servidor."); 
+        }
     }
 
     async function deletarRegistro(id) {
