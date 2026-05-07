@@ -2,287 +2,345 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tropical Motos | Arquivo Permanente</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --honda-red: #cc0000;
-            --dark-bg: #050505;
-            --card-bg: #111;
-            --accent-blue: #0044ff;
-            --text-glow: 0 0 10px rgba(0, 68, 255, 0.5);
+            --honda-red: #0723f9; --honda-dark: #092bd5;
+            --bg-gradient-1: #0a0a0a; --bg-gradient-2: #1a0505; --bg-gradient-3: #0d0000;
+            --glass-bg: rgba(20, 20, 20, 0.7); --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff; --text-secondary: #b0b0b0;
         }
-
-        body {
-            background-color: var(--dark-bg);
-            color: white;
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 20px;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(-45deg, var(--bg-gradient-1), var(--bg-gradient-2), var(--bg-gradient-3), #1a0a0a);
+            background-size: 400% 400%; animation: gradientShift 15s ease infinite;
+            color: var(--text-primary); min-height: 100vh;
         }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--accent-blue);
-            padding-bottom: 10px;
-            margin-bottom: 30px;
+        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        header { 
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--honda-red); padding: 20px 40px; 
+            display: flex; justify-content: space-between; align-items: center; 
         }
-
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 24px;
-            letter-spacing: 2px;
-            color: white;
+        .logo-text { font-family: 'Orbitron', monospace; font-size: 24px; font-weight: 900; 
+            background: linear-gradient(135deg, #ffffff, var(--honda-red)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-
-        .btn-voltar {
-            background: transparent;
-            color: white;
-            border: 1px solid white;
-            padding: 8px 15px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 12px;
-            border-radius: 4px;
-        }
-
-        /* Filtros */
-        .filter-bar {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 15px;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            border: 1px solid #222;
-            margin-bottom: 25px;
-        }
-
-        .filter-group { display: flex; flex-direction: column; gap: 5px; }
-        label { font-size: 10px; color: #888; text-transform: uppercase; }
-        select, input {
-            background: #1a1a1a;
-            border: 1px solid var(--accent-blue);
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            outline: none;
-        }
-
-        .total-vendas {
-            margin-left: auto;
-            color: var(--accent-blue);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 20px;
-            text-shadow: var(--text-glow);
-        }
-
-        /* Cards de Destaque */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            border: 1px solid #222;
-            transition: 0.3s;
-        }
-
-        .stat-card:hover { border-color: var(--accent-blue); transform: translateY(-5px); }
-        .stat-label { font-size: 14px; color: #aaa; margin-bottom: 10px; }
-        .stat-value { font-family: 'Orbitron', sans-serif; font-size: 22px; color: white; display: block; }
-        .stat-subtext { color: var(--accent-blue); font-size: 12px; margin-top: 5px; }
-
-        /* Tabela de Ranking */
-        .ranking-section {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid #222;
-        }
-
-        .ranking-title {
-            color: var(--accent-blue);
-            font-family: 'Orbitron', sans-serif;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px; color: #888; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #222; }
-        td { padding: 15px; border-bottom: 1px solid #1a1a1a; font-size: 15px; }
+        .nav-btn { padding: 10px 20px; background: transparent; border: 1px solid var(--honda-red); color: white; border-radius: 8px; cursor: pointer; font-family: 'Orbitron', monospace; font-size: 12px; }
+        .container { padding: 30px; max-width: 1300px; margin: 0 auto; }
+        .filter-section { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px; margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; }
+        select, input { padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid var(--honda-red); color: white; border-radius: 8px; font-family: 'Orbitron', monospace; }
         
-        .posicao { color: #555; width: 50px; }
-        .vendedor-nome { font-weight: bold; }
-        .total-venda-num { color: white; text-align: right; }
+        .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px; text-align: center; }
+        .kpi-value { font-family: 'Orbitron', monospace; font-size: 22px; font-weight: bold; color: #fff; text-shadow: 0 0 15px var(--honda-red); }
+        .kpi-detail { font-size: 14px; color: var(--honda-red); margin-top: 10px; font-weight: bold; }
+        
+        .report-table-container { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 25px; margin-bottom: 30px; }
+        
+        .scroll-area { 
+            max-height: 420px; 
+            overflow-y: auto; 
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+        .scroll-area::-webkit-scrollbar { width: 8px; }
+        .scroll-area::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .scroll-area::-webkit-scrollbar-thumb { background: var(--honda-red); border-radius: 10px; }
 
-        tr:first-child td { color: #00ff00; } /* Destaque para o 1º lugar */
+        h2 { font-family: 'Orbitron', monospace; color: var(--honda-red); margin-bottom: 20px; text-transform: uppercase; font-size: 18px; border-left: 5px solid var(--honda-red); padding-left: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background: linear-gradient(135deg, var(--honda-red), var(--honda-dark)); color: white; padding: 15px; text-align: left; text-transform: uppercase; font-family: 'Orbitron', monospace; font-size: 12px; position: sticky; top: 0; }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary); }
+        .badge-color { padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 11px; color: #fff; display: inline-block; min-width: 120px; text-align: center; text-transform: uppercase; }
 
-        @media (max-width: 768px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .filter-bar { flex-direction: column; align-items: stretch; }
+        .charts-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
+            gap: 30px; 
+            margin-top: 30px;
+        }
+        .chart-card { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid var(--glass-border); 
+            padding: 25px; 
+            border-radius: 20px; 
+            height: 400px; 
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>TROPICAL MOTOS | ARQUIVO PERMANENTE</h1>
-    <a href="/" class="btn-voltar">← VOLTAR AO PAINEL</a>
+    <span class="logo-text">TROPICAL MOTOS | ARQUIVO PERMANENTE</span>
+    <button class="nav-btn" onclick="window.location.href='/'">⬅ VOLTAR AO PAINEL</button>
 </header>
 
-<div class="filter-bar">
-    <div class="filter-group">
-        <label>Mês</label>
-        <select id="mes" onchange="carregarDados()">
-            <option value="">Todos</option>
-            <option value="01">Janeiro</option><option value="02">Fevereiro</option>
-            <option value="03">Março</option><option value="04">Abril</option>
-            <option value="05" selected>Maio</option><option value="06">Junho</option>
-            <option value="07">Julho</option><option value="08">Agosto</option>
-            <option value="09">Setembro</option><option value="10">Outubro</option>
-            <option value="11">Novembro</option><option value="12">Dezembro</option>
-        </select>
+<div class="container">
+    <div class="filter-section">
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <div style="display:flex; flex-direction:column; gap:5px">
+                <label style="font-family: 'Orbitron'; font-size: 10px;">MÊS</label>
+                <select id="filtro-mes" onchange="gerarRelatorio()">
+                    <option value="01">Janeiro</option><option value="02">Fevereiro</option><option value="03">Março</option>
+                    <option value="04">Abril</option><option value="05">Maio</option><option value="06">Junho</option>
+                    <option value="07">Julho</option><option value="08">Agosto</option><option value="09">Setembro</option>
+                    <option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+                </select>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:5px">
+                <label style="font-family: 'Orbitron'; font-size: 10px;">ANO</label>
+                <select id="filtro-ano" onchange="gerarRelatorio()">
+                    <option value="2024">2024</option><option value="2025">2025</option><option value="2026" selected>2026</option>
+                </select>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:5px">
+                <label style="font-family: 'Orbitron'; font-size: 10px;">DIA (OPCIONAL)</label>
+                <input type="date" id="filtro-dia" onchange="gerarRelatorio()">
+            </div>
+        </div>
+        <div id="total-geral" style="font-family: 'Orbitron'; color: var(--honda-red); font-weight: bold;">
+            Total de Vendas: 0
+        </div>
     </div>
-    <div class="filter-group">
-        <label>Ano</label>
-        <select id="ano" onchange="carregarDados()">
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-            <option value="2026" selected>2026</option>
-        </select>
-    </div>
-    <div class="filter-group">
-        <label>Dia (Opcional)</label>
-        <input type="date" id="dia" onchange="carregarDados()">
-    </div>
-    <div class="total-vendas">Total de Vendas: <span id="total-geral">0</span></div>
-</div>
 
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-label">Moto Mais Vendida</div>
-        <div class="stat-value" id="top-moto">-</div>
-        <div class="stat-subtext" id="top-moto-count">0 unidades vendidas</div>
+    <div class="kpi-container">
+        <div class="kpi-card">
+            <h3>Moto Mais Vendida</h3>
+            <div class="kpi-value" id="top-modelo">---</div>
+            <div class="kpi-detail" id="top-cor">---</div>
+        </div>
+        <div class="kpi-card">
+            <h3>Vendedor Destaque</h3>
+            <div class="kpi-value" id="top-vendedor">---</div>
+            <div class="kpi-detail" id="total-vendas-vendedor">0 Vendas no período</div>
+        </div>
+        <div class="kpi-card">
+            <h3>Cidade com Maior Demanda</h3>
+            <div class="kpi-value" id="top-cidade">---</div>
+            <div class="kpi-detail" id="total-cidade">0 Motos</div>
+        </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-label">Vendedor Destaque</div>
-        <div class="stat-value" id="top-vendedor">-</div>
-        <div class="stat-subtext" id="top-vendedor-count">0 Vendas no período</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Cidade com Maior Demanda</div>
-        <div class="stat-value" id="top-cidade">-</div>
-        <div class="stat-subtext" id="top-cidade-count">0 Motos</div>
-    </div>
-</div>
 
-<div class="ranking-section">
-    <div class="ranking-title">
-        <div style="width: 4px; height: 20px; background: var(--accent-blue);"></div>
-        RANKING DE VENDEDORES (TOP PERFORMANCE)
+    <div class="report-table-container">
+        <h2>Ranking de Vendedores (Top Performance)</h2>
+        <div class="scroll-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Posição</th>
+                        <th>Vendedor</th>
+                        <th style="text-align:center">Total de Vendas</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-ranking"></tbody>
+            </table>
+        </div>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th class="posicao">POSIÇÃO</th>
-                <th>VENDEDOR</th>
-                <th style="text-align: right;">TOTAL DE VENDAS</th>
-            </tr>
-        </thead>
-        <tbody id="ranking-body">
-            </tbody>
-    </table>
+
+    <div class="report-table-container">
+        <h2>Detalhamento do Arquivo Histórico</h2>
+        <div class="scroll-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vendedor</th>
+                        <th>Modelo</th>
+                        <th>Cor</th>
+                        <th>Cidade</th>
+                        <th>Data</th>
+                        <th style="text-align:center">QTD</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-relatorio"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="charts-container">
+        <div class="chart-card">
+            <h2>Vendas por Vendedor</h2>
+            <canvas id="chartBarras"></canvas>
+        </div>
+        <div class="chart-card">
+            <h2>Distribuição de Modelos</h2>
+            <canvas id="chartPizza"></canvas>
+        </div>
+    </div>
 </div>
 
 <script>
-    const API_URL = ""; // Deixe vazio se estiver no mesmo servidor
+    // AJUSTE PARA O RENDER: Detecta automaticamente o endereço do servidor
+    const API_URL = window.location.origin;
+    let myBarChart = null;
+    let myPieChart = null;
 
-    async function carregarDados() {
-        const mes = document.getElementById('mes').value;
-        const ano = document.getElementById('ano').value;
-        const dia = document.getElementById('dia').value;
+    function getCorStyle(nomeCor) {
+        if (!nomeCor) return "background:#333";
+        const c = nomeCor.toUpperCase();
+        if (c.includes("VERMELH")) return "background:#B00404";
+        if (c.includes("AZUL")) return "background:#161692";
+        if (c.includes("PRETO") || c.includes("PRETA")) return "background:#000000";
+        if (c.includes("BRANCO") || c.includes("BRANCA")) return "background:#FFFFFF; color:#333";
+        if (c.includes("AMAREL")) return "background:#FFFF00; color:#000";
+        if (c.includes("LARANJA")) return "background:#FF8C00";
+        if (c.includes("PRATA")) return "background:#C0C0C0; color:#333";
+        if (c.includes("CINZA")) return "background:#808080";
+        return "background:#333";
+    }
+
+    async function gerarRelatorio() {
+        const mes = document.getElementById('filtro-mes').value;
+        const ano = document.getElementById('filtro-ano').value;
+        const dia = document.getElementById('filtro-dia').value;
 
         try {
-            const response = await fetch(`/get_historico?mes=${mes}&ano=${ano}&dia=${dia}`);
-            const dados = await response.json();
+            const res = await fetch(`${API_URL}/get_historico?mes=${mes}&ano=${ano}&dia=${dia}`);
+            const vendas = await res.json();
+            
+            document.getElementById('total-geral').innerText = `Total de Vendas: ${vendas.length}`;
 
-            processarEstatisticas(dados);
-        } catch (error) {
-            console.error("Erro ao buscar dados:", error);
+            if(vendas.length === 0) {
+                limparKpis();
+                return;
+            }
+            processarDados(vendas);
+        } catch (e) {
+            console.error("Erro ao buscar dados:", e);
         }
     }
 
-    function processarEstatisticas(vendas) {
-        document.getElementById('total-geral').innerText = vendas.length;
+    function limparKpis() {
+        document.getElementById('top-modelo').innerText = "---";
+        document.getElementById('top-cor').innerText = "---";
+        document.getElementById('top-vendedor').innerText = "---";
+        document.getElementById('total-vendas-vendedor').innerText = "0 Vendas";
+        document.getElementById('top-cidade').innerText = "---";
+        document.getElementById('total-cidade').innerText = "0 Motos";
+        document.getElementById('tabela-relatorio').innerHTML = "<tr><td colspan='6' style='text-align:center'>Nenhum registro encontrado.</td></tr>";
+        document.getElementById('tabela-ranking').innerHTML = "";
+        if (myBarChart) myBarChart.destroy();
+        if (myPieChart) myPieChart.destroy();
+    }
 
-        if (vendas.length === 0) {
-            limparDashboard();
-            return;
-        }
-
-        const contagemMotos = {};
-        const contagemVendedores = {};
-        const contagemCidades = {};
+    function processarDados(vendas) {
+        const modCount = {}; const venCount = {}; const cidCount = {}; const detailedRows = {};
 
         vendas.forEach(v => {
-            contagemMotos[v.modelo] = (contagemMotos[v.modelo] || 0) + 1;
-            contagemVendedores[v.vendedor] = (contagemVendedores[v.vendedor] || 0) + 1;
-            contagemCidades[v.cidade] = (contagemCidades[v.cidade] || 0) + 1;
+            modCount[v.modelo] = (modCount[v.modelo] || 0) + 1;
+            venCount[v.vendedor] = (venCount[v.vendedor] || 0) + 1;
+            cidCount[v.cidade] = (cidCount[v.cidade] || 0) + 1;
+            
+            const rowKey = `${v.vendedor}#${v.modelo}#${v.cor}#${v.cidade}#${v.data}`;
+            detailedRows[rowKey] = (detailedRows[rowKey] || 0) + 1;
         });
 
-        // Encontrar os tops
-        const topMoto = Object.entries(contagemMotos).sort((a,b) => b[1] - a[1])[0];
-        const topVendedor = Object.entries(contagemVendedores).sort((a,b) => b[1] - a[1])[0];
-        const topCidade = Object.entries(contagemCidades).sort((a,b) => b[1] - a[1])[0];
+        const topM = Object.keys(modCount).reduce((a, b) => modCount[a] > modCount[b] ? a : b);
+        document.getElementById('top-modelo').innerText = topM;
+        document.getElementById('top-cor').innerText = `${modCount[topM]} unidades vendidas`;
 
-        // Atualizar Cards
-        document.getElementById('top-moto').innerText = topMoto[0];
-        document.getElementById('top-moto-count').innerText = `${topMoto[1]} unidades vendidas`;
+        const topV = Object.keys(venCount).reduce((a, b) => venCount[a] > venCount[b] ? a : b);
+        document.getElementById('top-vendedor').innerText = topV;
+        document.getElementById('total-vendas-vendedor').innerText = `${venCount[topV]} Vendas no período`;
 
-        document.getElementById('top-vendedor').innerText = topVendedor[0];
-        document.getElementById('top-vendedor-count').innerText = `${topVendedor[1]} Vendas no período`;
+        const topC = Object.keys(cidCount).reduce((a, b) => cidCount[a] > cidCount[b] ? a : b);
+        document.getElementById('top-cidade').innerText = topC;
+        document.getElementById('total-cidade').innerText = `${cidCount[topC]} Motos`;
 
-        document.getElementById('top-cidade').innerText = topCidade[0];
-        document.getElementById('top-cidade-count').innerText = `${topCidade[1]} Motos`;
+        const rankingArray = Object.keys(venCount).map(name => ({ name, total: venCount[name] }));
+        rankingArray.sort((a, b) => b.total - a.total);
 
-        // Gerar Ranking
-        const rankingBody = document.getElementById('ranking-body');
-        rankingBody.innerHTML = "";
-        
-        Object.entries(contagemVendedores)
-            .sort((a,b) => b[1] - a[1])
-            .forEach((vendedor, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="posicao">${index + 1}º</td>
-                    <td class="vendedor-nome">${vendedor[0]}</td>
-                    <td class="total-venda-num">${vendedor[1]}</td>
-                `;
-                rankingBody.appendChild(tr);
-            });
+        const tbodyRanking = document.getElementById('tabela-ranking');
+        tbodyRanking.innerHTML = "";
+        rankingArray.forEach((item, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-family:'Orbitron'">${index + 1}º</td>
+                <td style="font-weight:bold; color:white">${item.name}</td>
+                <td style="text-align:center; font-family:'Orbitron'">${item.total}</td>
+            `;
+            tbodyRanking.appendChild(tr);
+        });
+
+        const tbodyDet = document.getElementById('tabela-relatorio');
+        tbodyDet.innerHTML = "";
+        const rowsArray = Object.keys(detailedRows).map(key => {
+            const [vendedor, modelo, cor, cidade, data] = key.split('#');
+            return { vendedor, modelo, cor, cidade, data, qtd: detailedRows[key] };
+        });
+        rowsArray.sort((a, b) => b.data.localeCompare(a.data));
+        rowsArray.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:bold; color:white">${row.vendedor}</td>
+                <td>${row.modelo}</td>
+                <td><span class="badge-color" style="${getCorStyle(row.cor)}">${row.cor}</span></td>
+                <td>${row.cidade}</td>
+                <td style="font-family:'Orbitron'; font-size:12px">${row.data}</td>
+                <td style="text-align:center; font-family:'Orbitron'; font-weight:bold;">${row.qtd}</td>
+            `;
+            tbodyDet.appendChild(tr);
+        });
+
+        renderCharts(rankingArray, modCount);
     }
 
-    function limparDashboard() {
-        document.getElementById('top-moto').innerText = "-";
-        document.getElementById('top-vendedor').innerText = "-";
-        document.getElementById('top-cidade').innerText = "-";
-        document.getElementById('ranking-body').innerHTML = "<tr><td colspan='3'>Nenhuma venda encontrada</td></tr>";
+    function renderCharts(rankingData, modelData) {
+        const ctxBar = document.getElementById('chartBarras').getContext('2d');
+        const ctxPie = document.getElementById('chartPizza').getContext('2d');
+        if (myBarChart) myBarChart.destroy();
+        if (myPieChart) myPieChart.destroy();
+
+        myBarChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: rankingData.map(d => d.name),
+                datasets: [{
+                    label: 'Vendas',
+                    data: rankingData.map(d => d.total),
+                    backgroundColor: '#0723f9',
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#fff' } },
+                    x: { ticks: { color: '#fff' } }
+                },
+                plugins: { legend: { labels: { color: '#fff' } } }
+            }
+        });
+
+        myPieChart = new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(modelData),
+                datasets: [{
+                    data: Object.values(modelData),
+                    backgroundColor: ['#B00404', '#0723f9', '#222', '#FFFF00', '#C0C0C0', '#FF8C00', '#808080', '#FFFFFF'],
+                    borderColor: '#1a1a1a'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
+            }
+        });
     }
 
-    window.onload = carregarDados;
+    window.onload = () => {
+        const agora = new Date();
+        document.getElementById('filtro-mes').value = String(agora.getMonth() + 1).padStart(2, '0');
+        document.getElementById('filtro-ano').value = agora.getFullYear();
+        gerarRelatorio();
+    };
 </script>
-
 </body>
 </html>
