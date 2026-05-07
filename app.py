@@ -14,7 +14,6 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db_connection():
     if DATABASE_URL:
-        # Conecta ao banco de dados do Render
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         return conn
     else:
@@ -23,7 +22,6 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
-    # Tabela do Painel (Motos que aparecem no telão)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS entregas (
             id SERIAL PRIMARY KEY,
@@ -38,7 +36,6 @@ def init_db():
             obs TEXT
         );
     """)
-    # Tabela do Histórico (Dados permanentes para os relatórios)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS historico (
             id SERIAL PRIMARY KEY,
@@ -58,11 +55,14 @@ def init_db():
     cur.close()
     conn.close()
 
-# Inicializa o banco ao iniciar o app
 try:
     init_db()
 except Exception as e:
     print(f"Atenção: Erro ao iniciar banco: {e}")
+
+# ==============================================================================
+# ROTAS DE PÁGINAS (HTML)
+# ==============================================================================
 
 @app.route('/')
 def home():
@@ -72,13 +72,16 @@ def home():
 def relatorio_page():
     return render_template('relatorios.html')
 
-@app.route('/proximo_reg', methods=['GET'])
-def proximo_reg():
-
 @app.route('/admin')
 def admin_page():
     return render_template('admin.html')
 
+# ==============================================================================
+# ROTAS DE API (DADOS)
+# ==============================================================================
+
+@app.route('/proximo_reg', methods=['GET'])
+def proximo_reg():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -107,7 +110,6 @@ def get_entregas():
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
-# --- FUNÇÃO QUE ESTAVA FALTANDO: ALIMENTA O RELATÓRIO ---
 @app.route('/get_historico', methods=['GET'])
 def get_historico():
     try:
@@ -118,18 +120,15 @@ def get_historico():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        # Seleciona dados da tabela de histórico
         query = "SELECT vendedor, modelo, cor, cidade, data_entrega as data FROM historico WHERE 1=1"
         params = []
 
         if ano_filtro:
             query += " AND data_entrega LIKE %s"
             params.append(f"{ano_filtro}%")
-            
         if mes_filtro:
             query += " AND data_entrega LIKE %s"
             params.append(f"%-{mes_filtro}-%")
-            
         if dia_filtro:
             query += " AND data_entrega = %s"
             params.append(dia_filtro)
@@ -140,7 +139,6 @@ def get_historico():
         conn.close()
         return jsonify(historico)
     except Exception as e:
-        print(f"Erro no relatório: {e}")
         return jsonify({"erro": str(e)}), 500
 
 @app.route('/salvar', methods=['POST'])
