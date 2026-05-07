@@ -2,31 +2,54 @@ import os
 import sqlite3
 import csv 
 from datetime import datetime
-from flask import Flask, request, jsonify, render_template  # Adicionado render_template
+from flask import Flask, request, jsonify, render_template 
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
-# Ajuste de Caminhos para o Render
-DB_PATH = 'oficina.db'
-CSV_PATH = 'historico_entregas.csv'
+# --- CORREÇÃO 1: CAMINHOS ABSOLUTOS ---
+# Isso evita que o Render se perca ao tentar gravar arquivos
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'oficina.db')
+CSV_PATH = os.path.join(BASE_DIR, 'historico_entregas.csv')
 
-# --- NOVA ROTA PRINCIPAL ---
+# --- CORREÇÃO 2: CRIAÇÃO AUTOMÁTICA DO BANCO ---
+# Se o banco não existir no Render, os botões de enviar vão dar erro 500.
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS entregas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            num TEXT,
+            data TEXT,
+            hora TEXT,
+            modelo TEXT,
+            cor TEXT,
+            chassi TEXT,
+            vendedor TEXT,
+            cidade TEXT,
+            obs TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+init_db() # Executa ao iniciar o app
+
 @app.route('/')
 def home():
-    # Isso busca automaticamente o arquivo dentro da pasta /templates
     return render_template('index.html')
 
 @app.route('/relatorio')
 def relatorio_page():
-    # Rota para abrir a página de relatórios
     return render_template('relatorios.html')
-# ---------------------------
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH, timeout=30)
     conn.row_factory = sqlite3.Row
+    # WAL mode é excelente para nuvem (evita Database is locked)
     conn.execute('PRAGMA journal_mode=WAL;')
     conn.execute('PRAGMA synchronous=NORMAL;')
     return conn
@@ -112,7 +135,8 @@ def registrar_historico():
     try:
         dados = request.json
         arquivo_existe = os.path.exists(CSV_PATH)
-        arquivo_vazio = os.stat(CSV_PATH).st_size == 0 if arquivo_existe else True
+        # CORREÇÃO 3: Verificação de arquivo vazio mais robusta
+        arquivo_vazio = not arquivo_existe or os.stat(CSV_PATH).st_size == 0
         
         with open(CSV_PATH, mode='a', newline='', encoding='utf-8-sig') as file:
             escritor = csv.writer(file, delimiter=';')
@@ -155,4 +179,6 @@ def limpar_painel():
         return jsonify({"erro": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 10000)))
+    # CORREÇÃO 4: Porta dinâmica para o Render
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
