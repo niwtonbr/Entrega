@@ -10,23 +10,20 @@ app = Flask(__name__)
 CORS(app)
 
 # --- CONFIGURAÇÃO DO BANCO DE DADOS (POSTGRESQL) ---
-# O Render fornece a variável DATABASE_URL automaticamente
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db_connection():
-    # Se estiver local, usa o sqlite (simples), se estiver no render, usa postgres
     if DATABASE_URL:
+        # Conecta ao banco de dados do Render
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         return conn
     else:
-        # Fallback para desenvolvimento local (simulando SQLite via Postgres ou similar)
-        # Para simplificar, assumimos que no Render a URL existirá.
-        raise Exception("DATABASE_URL não configurada no ambiente.")
+        raise Exception("DATABASE_URL não configurada no ambiente do Render.")
 
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
-    # Criação da tabela de Entregas (Painel)
+    # Tabela do Painel (Motos que aparecem no telão)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS entregas (
             id SERIAL PRIMARY KEY,
@@ -41,7 +38,7 @@ def init_db():
             obs TEXT
         );
     """)
-    # Criação da tabela de Histórico (Substituindo o CSV que sumia no Render)
+    # Tabela do Histórico (Dados permanentes para os relatórios)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS historico (
             id SERIAL PRIMARY KEY,
@@ -61,11 +58,11 @@ def init_db():
     cur.close()
     conn.close()
 
-# Inicializa o banco ao subir o app
+# Inicializa o banco ao iniciar o app
 try:
     init_db()
 except Exception as e:
-    print(f"Erro ao iniciar banco: {e}")
+    print(f"Atenção: Erro ao iniciar banco: {e}")
 
 @app.route('/')
 def home():
@@ -105,6 +102,7 @@ def get_entregas():
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
+# --- FUNÇÃO QUE ESTAVA FALTANDO: ALIMENTA O RELATÓRIO ---
 @app.route('/get_historico', methods=['GET'])
 def get_historico():
     try:
@@ -115,16 +113,18 @@ def get_historico():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
+        # Seleciona dados da tabela de histórico
         query = "SELECT vendedor, modelo, cor, cidade, data_entrega as data FROM historico WHERE 1=1"
         params = []
 
         if ano_filtro:
             query += " AND data_entrega LIKE %s"
-            params.append(f"%{ano_filtro}%")
+            params.append(f"{ano_filtro}%")
+            
         if mes_filtro:
-            # Ajuste simples para busca de mês em string
             query += " AND data_entrega LIKE %s"
-            params.append(f"%/{mes_filtro}/%")
+            params.append(f"%-{mes_filtro}-%")
+            
         if dia_filtro:
             query += " AND data_entrega = %s"
             params.append(dia_filtro)
@@ -135,6 +135,7 @@ def get_historico():
         conn.close()
         return jsonify(historico)
     except Exception as e:
+        print(f"Erro no relatório: {e}")
         return jsonify({"erro": str(e)}), 500
 
 @app.route('/salvar', methods=['POST'])
