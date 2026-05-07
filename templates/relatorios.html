@@ -32,14 +32,13 @@
         .kpi-value { font-family: 'Orbitron', monospace; font-size: 20px; font-weight: bold; color: #fff; text-shadow: 0 0 15px var(--honda-red); }
         .kpi-detail { font-size: 14px; color: var(--honda-red); margin-top: 10px; font-weight: bold; }
         
-        /* ESTILO PARA AS LISTAS TOP 3 */
         .top3-list { list-style: none; padding: 0; margin: 15px 0; text-align: left; }
         .top3-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: 'Orbitron', monospace; font-size: 13px; }
         .top3-item span { color: var(--text-secondary); }
         .top3-item b { color: white; text-shadow: 0 0 5px var(--honda-red); }
 
         .report-table-container { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 25px; margin-bottom: 30px;}
-        .scroll-area { max-height: 400px; overflow-y: auto; margin-top: 20px; }
+        .scroll-area { max-height: 420px; overflow-y: auto; margin-top: 20px; border-radius: 10px; }
         .scroll-area::-webkit-scrollbar { width: 8px; }
         .scroll-area::-webkit-scrollbar-thumb { background: var(--honda-red); border-radius: 10px; }
 
@@ -107,7 +106,13 @@
         <h2>Ranking Completo de Vendedores</h2>
         <div class="scroll-area">
             <table>
-                <thead><tr><th>Pos</th><th>Vendedor</th><th style="text-align:center">Vendas</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Posição</th>
+                        <th>Vendedor</th>
+                        <th style="text-align:center">Vendas</th>
+                    </tr>
+                </thead>
                 <tbody id="tabela-ranking"></tbody>
             </table>
         </div>
@@ -149,19 +154,14 @@
 
     function processarDados(vendas) {
         const modCount = {}, venCount = {}, cidCount = {};
-        
         vendas.forEach(v => {
             modCount[v.modelo] = (modCount[v.modelo] || 0) + 1;
             venCount[v.vendedor] = (venCount[v.vendedor] || 0) + 1;
             cidCount[v.cidade] = (cidCount[v.cidade] || 0) + 1;
         });
 
-        // Função auxiliar para criar Top 3
         const createTop3 = (countObj, elementId) => {
-            const sorted = Object.entries(countObj)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 3);
-            
+            const sorted = Object.entries(countObj).sort((a, b) => b[1] - a[1]).slice(0, 3);
             const listDiv = document.getElementById(elementId);
             listDiv.innerHTML = "";
             sorted.forEach(([name, val], i) => {
@@ -170,24 +170,23 @@
             return sorted;
         };
 
-        // Aplicando Top 3 para os três KPIs
-        const topModels = createTop3(modCount, 'top-modelos-list');
-        const topVendedores = createTop3(venCount, 'top-vendedores-list');
-        const topCidades = createTop3(cidCount, 'top-cidades-list');
+        createTop3(modCount, 'top-modelos-list');
+        createTop3(venCount, 'top-vendedores-list');
+        createTop3(cidCount, 'top-cidades-list');
 
-        // Totais nos detalhes
         document.getElementById('total-modelos').innerText = `${vendas.length} Unidades`;
         document.getElementById('total-vendas-vendedor').innerText = `${vendas.length} Vendas no total`;
         document.getElementById('total-cidades').innerText = `${vendas.length} Motos`;
 
-        // Tabela Ranking Completa
         const rankingArray = Object.keys(venCount).map(name => ({ name, total: venCount[name] }));
         rankingArray.sort((a, b) => b.total - a.total);
 
         const tbody = document.getElementById('tabela-ranking');
         tbody.innerHTML = "";
         rankingArray.forEach((item, index) => {
-            tbody.innerHTML += `<tr><td>${index+1}º</td><td>${item.name}</td><td style="text-align:center">${item.total}</td></tr>`;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${index+1}º</td><td style="font-weight:bold; color:white">${item.name}</td><td style="text-align:center">${item.total}</td>`;
+            tbody.appendChild(tr);
         });
 
         renderCharts(rankingArray, modCount);
@@ -198,16 +197,20 @@
         const ctxPie = document.getElementById('chartPizza').getContext('2d');
         if (myBarChart) myBarChart.destroy(); if (myPieChart) myPieChart.destroy();
 
+        // Paleta de cores neon para as barras
+        const colors = ['#FF0055', '#00FFCC', '#FFFF00', '#00FF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080', '#FFFFFF', '#C0C0C0'];
+        const barColors = rankingData.map((_, i) => colors[i % colors.length]);
+
         myBarChart = new Chart(ctxBar, {
             type: 'bar',
-            data: { labels: rankingData.map(d => d.name), datasets: [{ label: 'Vendas', data: rankingData.map(d => d.total), backgroundColor: '#0723f9' }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#fff' } }, x: { ticks: { color: '#fff' } } } }
+            data: { labels: rankingData.map(d => d.name), datasets: [{ label: 'Vendas', data: rankingData.map(d => d.total), backgroundColor: barColors }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { ticks: { color: '#fff' } } }, plugins: { legend: { display: false } } }
         });
 
         myPieChart = new Chart(ctxPie, {
             type: 'pie',
-            data: { labels: Object.keys(modelData), datasets: [{ data: Object.values(modelData), backgroundColor: ['#cc0000', '#0000aa', '#ffff00', '#00ff00', '#888', '#f80'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } } }
+            data: { labels: Object.keys(modelData), datasets: [{ data: Object.values(modelData), backgroundColor: colors }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
         });
     }
 
