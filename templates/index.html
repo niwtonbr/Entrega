@@ -15,24 +15,10 @@
         }
 
         /* Estilização da Barra de Rolagem (Scrollbar) */
-        ::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #5dc9ea;
-            border-radius: 15px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--honda-red);
-            border-radius: 10px;
-            border: 2px solid #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--honda-dark);
-        }
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #5dc9ea; border-radius: 15px; }
+        ::-webkit-scrollbar-thumb { background: var(--honda-red); border-radius: 10px; border: 2px solid #f1f1f1; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--honda-dark); }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
@@ -57,7 +43,6 @@
         }
 
         .header-left { display: flex; align-items: center; gap: 15px; }
-
         .logo-honda { 
             width: 42px !important; 
             height: auto;
@@ -65,13 +50,10 @@
             transition: 0.3s; 
             object-fit: contain;
         }
-
         .logo-text { font-family: 'Brush Script MT', cursive; font-size: 36px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        
         #relogio { font-family: 'Consolas', monospace; font-weight: bold; font-size: 24px; background: #000; color: #00ff00; padding: 6px 18px; border-radius: 10px; border: 2px solid #444; }
         
         .dashboard { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; }
-        
         .col-cadastro, .col-tabela { 
             background: var(--glass); 
             backdrop-filter: blur(10px);
@@ -85,12 +67,10 @@
         .col-tabela { flex: 1; display: flex; flex-direction: column; }
 
         h2 { font-size: 16px; color: var(--honda-red); border-bottom: 3px solid var(--honda-red); margin-bottom: 15px; padding-bottom: 5px; text-transform: uppercase; }
-        
         .form-group { margin-bottom: 12px; }
         label { display: block; font-size: 11px; font-weight: bold; color: #666; margin-bottom: 5px; text-transform: uppercase; }
         input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; }
         input:focus, select:focus { border-color: var(--honda-red); box-shadow: 0 0 8px rgba(204, 0, 0, 0.2); }
-        
         .readonly-box { background: #f9f9f9; font-weight: bold; color: var(--honda-red); }
         
         .btn-enviar { width: 100%; padding: 15px; background: linear-gradient(to right, #1a1a7a, #0d0d4d); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 10px; transition: 0.3s; margin-top: 10px; }
@@ -232,7 +212,7 @@
 </div>
 
 <script>
-    /* CORREÇÃO 1: API_URL VAZIA PARA FUNCIONAR NA NUVEM */
+    /* API_URL VAZIA PARA FUNCIONAR NO RENDER */
     const API_URL = ""; 
     let modelosChart, vendedoresChart;
 
@@ -293,11 +273,7 @@
                 tr.innerHTML = `
                     <td><b>${e.id}</b></td>
                     <td>${e.modelo}</td>
-                    <td>
-                        <span style="${obterEstiloCor(e.cor)} display: inline-block; padding: 5px 15px; border-radius: 8px; width: 150px; font-weight: bold; text-align: center;">
-                            ${e.cor}
-                        </span>
-                    </td>
+                    <td><span style="${obterEstiloCor(e.cor)} display: inline-block; padding: 5px 15px; border-radius: 8px; width: 150px; font-weight: bold; text-align: center;">${e.cor}</span></td>
                     <td>${e.chassi}</td>
                     <td>${e.vendedor}</td>
                     <td>${e.cidade}</td>
@@ -309,7 +285,6 @@
         } catch(e) { console.error(e); }
     }
 
-    /* CORREÇÃO 2: FUNÇÃO ENVIAR DADOS COM REDIRECIONAMENTO */
     async function enviarDados() {
         const payload = {
             nf: document.getElementById('nf').value, data: document.getElementById('data').value,
@@ -320,19 +295,24 @@
         };
 
         try {
-            const resSalvar = await fetch(`${API_URL}/salvar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-            const resHist = await fetch(`${API_URL}/registrar_historico`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            const resS = await fetch(`${API_URL}/salvar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            const resH = await fetch(`${API_URL}/registrar_historico`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
             
-            if (resSalvar.ok && resHist.ok) {
-                alert("Registro enviado com sucesso!");
-                // REDIRECIONA PARA O RELATÓRIO
-                window.location.href = '/relatorio';
+            if (resS.ok && resH.ok) {
+                // 1. Atualiza a tabela do painel imediatamente
+                await buscarNoBanco();
+                
+                // 2. Avisa o usuário
+                alert("✅ Registro enviado com sucesso!");
+                
+                // 3. Pergunta se quer ir para o relatório
+                if(confirm("Deseja visualizar o Relatório de Vendedores agora?")) {
+                    window.location.href = '/relatorio';
+                }
             } else {
-                alert("Erro ao salvar dados no servidor.");
+                alert("Erro ao salvar no servidor.");
             }
-        } catch (e) { 
-            alert("Erro de conexão com o servidor."); 
-        }
+        } catch (e) { alert("Erro de conexão com o servidor."); }
     }
 
     async function deletarRegistro(id) {
