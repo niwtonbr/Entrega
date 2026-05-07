@@ -74,6 +74,10 @@ def relatorio_page():
 
 @app.route('/proximo_reg', methods=['GET'])
 def proximo_reg():
+    @app.route('/admin')
+def admin_page():
+    return render_template('admin.html')
+
     try:
         conn = get_db_connection()
         cur = conn.cursor()
