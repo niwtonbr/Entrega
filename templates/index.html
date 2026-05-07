@@ -212,7 +212,6 @@
 </div>
 
 <script>
-    /* API_URL VAZIA PARA FUNCIONAR NO RENDER */
     const API_URL = ""; 
     let modelosChart, vendedoresChart;
 
@@ -295,24 +294,24 @@
         };
 
         try {
+            // Envia para o banco e histórico simultaneamente
             const resS = await fetch(`${API_URL}/salvar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
             const resH = await fetch(`${API_URL}/registrar_historico`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
             
             if (resS.ok && resH.ok) {
-                // 1. Atualiza a tabela do painel imediatamente
+                // 1. Atualiza a tabela IMEDIATAMENTE sem atualizar a página
                 await buscarNoBanco();
                 
-                // 2. Avisa o usuário
-                alert("✅ Registro enviado com sucesso!");
+                // 2. Limpa apenas os campos que mudam a cada moto para agilizar o cadastro
+                document.getElementById('chassi').value = "";
+                document.getElementById('nf').value = "";
                 
-                // 3. Pergunta se quer ir para o relatório
-                if(confirm("Deseja visualizar o Relatório de Vendedores agora?")) {
-                    window.location.href = '/relatorio';
-                }
-            } else {
-                alert("Erro ao salvar no servidor.");
+                // 3. Atualiza o número do registro para a próxima moto
+                await atualizarNumeroReg();
             }
-        } catch (e) { alert("Erro de conexão com o servidor."); }
+        } catch (e) { 
+            console.error("Erro ao enviar:", e); 
+        }
     }
 
     async function deletarRegistro(id) {
