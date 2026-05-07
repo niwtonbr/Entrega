@@ -11,6 +11,7 @@
             --bg-gradient-1: #0a0a0a; --bg-gradient-2: #1a0505; --bg-gradient-3: #0d0000;
             --glass-bg: rgba(20, 20, 20, 0.7); --glass-border: rgba(255, 255, 255, 0.1);
             --text-primary: #ffffff; --text-secondary: #b0b0b0;
+            --table-blue: #0723f9;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -20,41 +21,84 @@
             color: var(--text-primary); min-height: 100vh;
         }
         @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        header { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); border-bottom: 2px solid var(--honda-red); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-text { font-family: 'Orbitron', monospace; font-size: 24px; font-weight: 900; background: linear-gradient(135deg, #ffffff, var(--honda-red)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        header { 
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--honda-red); padding: 20px 40px; 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .logo-text { font-family: 'Orbitron', monospace; font-size: 24px; font-weight: 900; 
+            background: linear-gradient(135deg, #ffffff, var(--honda-red)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
         .nav-btn { padding: 10px 20px; background: transparent; border: 1px solid var(--honda-red); color: white; border-radius: 8px; cursor: pointer; font-family: 'Orbitron', monospace; font-size: 12px; }
-        .container { padding: 30px; max-width: 1300px; margin: 0 auto; }
-        .filter-section { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px; margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; }
+        
+        .container { padding: 30px; max-width: 1400px; margin: 0 auto; }
+        
+        .filter-section { 
+            background: var(--glass-bg); backdrop-filter: blur(20px); 
+            border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px; 
+            margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 20px; 
+            align-items: center; justify-content: space-between; 
+        }
         select, input { padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid var(--honda-red); color: white; border-radius: 8px; font-family: 'Orbitron', monospace; }
-        
+
+        /* KPI CARDS - Estilo da Imagem */
         .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .kpi-card { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px; text-align: center; }
-        .kpi-value { font-family: 'Orbitron', monospace; font-size: 20px; font-weight: bold; color: #fff; text-shadow: 0 0 15px var(--honda-red); }
+        .kpi-card { 
+            background: var(--glass-bg); backdrop-filter: blur(20px); 
+            border: 1px solid var(--glass-border); padding: 25px; 
+            border-radius: 20px; text-align: center; 
+        }
+        .kpi-card h3 { font-family: 'Orbitron'; font-size: 14px; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; }
+        .kpi-value { font-family: 'Orbitron', monospace; font-size: 24px; font-weight: bold; color: #fff; text-shadow: 0 0 10px var(--honda-red); }
         .kpi-detail { font-size: 14px; color: var(--honda-red); margin-top: 10px; font-weight: bold; }
+
+        /* TABELAS - Estilo da Imagem */
+        .report-table-container { 
+            background: var(--glass-bg); backdrop-filter: blur(20px); 
+            border: 1px solid var(--glass-border); border-radius: 20px; 
+            padding: 25px; margin-bottom: 30px; 
+        }
+        .table-title { 
+            font-family: 'Orbitron', monospace; color: white; 
+            margin-bottom: 20px; text-transform: uppercase; 
+            font-size: 16px; border-left: 5px solid var(--honda-red); padding-left: 15px; 
+        }
+        .scroll-area { max-height: 450px; overflow-y: auto; margin-top: 10px; }
         
-        .top3-list { list-style: none; padding: 0; margin: 15px 0; text-align: left; }
-        .top3-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: 'Orbitron', monospace; font-size: 13px; }
-        .top3-item span { color: var(--text-secondary); }
-        .top3-item b { color: white; text-shadow: 0 0 5px var(--honda-red); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { 
+            background: var(--table-blue); color: white; 
+            padding: 12px 10px; text-align: left; 
+            text-transform: uppercase; font-family: 'Orbitron', monospace; 
+            font-size: 11px; position: sticky; top: 0; 
+        }
+        td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary); }
+        
+        /* Badges de Cores */
+        .badge-color { 
+            padding: 4px 10px; border-radius: 4px; font-weight: bold; 
+            font-size: 10px; color: #fff; display: inline-block; 
+            min-width: 110px; text-align: center; text-transform: uppercase; 
+        }
 
-        .report-table-container { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 25px; margin-bottom: 30px;}
-        .scroll-area { max-height: 420px; overflow-y: auto; margin-top: 20px; border-radius: 10px; }
-        .scroll-area::-webkit-scrollbar { width: 8px; }
-        .scroll-area::-webkit-scrollbar-thumb { background: var(--honda-red); border-radius: 10px; }
-
-        h2 { font-family: 'Orbitron', monospace; color: var(--honda-red); margin-bottom: 20px; text-transform: uppercase; font-size: 18px; border-left: 5px solid var(--honda-red); padding-left: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { background: linear-gradient(135deg, var(--honda-red), var(--honda-dark)); color: white; padding: 15px; text-align: left; text-transform: uppercase; font-family: 'Orbitron', monospace; font-size: 12px; position: sticky; top: 0; }
-        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary); }
-        .badge-color { padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 11px; color: #fff; display: inline-block; min-width: 120px; text-align: center; text-transform: uppercase; }
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; }
-        .chart-card { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; height: 400px; }
+        /* GRÁFICOS */
+        .charts-container { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
+            gap: 30px; margin-top: 30px; 
+        }
+        .chart-card { 
+            background: var(--glass-bg); backdrop-filter: blur(20px); 
+            border: 1px solid var(--glass-border); padding: 25px; 
+            border-radius: 20px; height: 400px; 
+        }
+        .chart-card h2 { font-family: 'Orbitron', monospace; color: var(--honda-red); margin-bottom: 20px; text-transform: uppercase; font-size: 16px; border-left: 5px solid var(--honda-red); padding-left: 15px; }
     </style>
 </head>
 <body>
 
 <header>
-    <span class="logo-text">TROPICAL MOTOS | ANALYTICS</span>
+    <span class="logo-text">TROPICAL MOTOS | ARQUIVO PERMANENTE</span>
     <button class="nav-btn" onclick="window.location.href='/'">⬅ VOLTAR AO PAINEL</button>
 </header>
 
@@ -77,40 +121,42 @@
                 </select>
             </div>
             <div style="display:flex; flex-direction:column; gap:5px">
-                <label style="font-family: 'Orbitron'; font-size: 10px;">DIA</label>
+                <label style="font-family: 'Orbitron'; font-size: 10px;">DIA (OPCIONAL)</label>
                 <input type="date" id="filtro-dia" onchange="gerarRelatorio()">
             </div>
         </div>
-        <div id="total-geral" style="font-family: 'Orbitron'; color: var(--honda-red); font-weight: bold;">Total: 0</div>
+        <div id="total-geral" style="font-family: 'Orbitron'; color: var(--honda-red); font-weight: bold;">
+            Total de Vendas: 0
+        </div>
     </div>
 
     <div class="kpi-container">
         <div class="kpi-card">
-            <h3 style="font-family:'Orbitron'; font-size:14px; color:var(--text-secondary)">Top 3 Modelos</h3>
-            <div id="top-modelos-list" class="top3-list"></div>
-            <div class="kpi-detail" id="total-modelos">0 Unidades</div>
+            <h3>Moto Mais Vendida</h3>
+            <div class="kpi-value" id="top-modelo">---</div>
+            <div class="kpi-detail" id="top-cor">---</div>
         </div>
         <div class="kpi-card">
-            <h3 style="font-family:'Orbitron'; font-size:14px; color:var(--text-secondary)">Top 3 Vendedores</h3>
-            <div id="top-vendedores-list" class="top3-list"></div>
-            <div class="kpi-detail" id="total-vendas-vendedor">0 Vendas no total</div>
+            <h3>Vendedor Destaque</h3>
+            <div class="kpi-value" id="top-vendedor">---</div>
+            <div class="kpi-detail" id="total-vendas-vendedor">0 Vendas no período</div>
         </div>
         <div class="kpi-card">
-            <h3 style="font-family:'Orbitron'; font-size:14px; color:var(--text-secondary)">Top 3 Cidades</h3>
-            <div id="top-cidades-list" class="top3-list"></div>
-            <div class="kpi-detail" id="total-cidades">0 Motos</div>
+            <h3>Cidade com Maior Demanda</h3>
+            <div class="kpi-value" id="top-cidade">---</div>
+            <div class="kpi-detail" id="total-cidade">0 Motos</div>
         </div>
     </div>
 
     <div class="report-table-container">
-        <h2>Ranking Completo de Vendedores</h2>
+        <div class="table-title">RANKING DE VENDEDORES (TOP PERFORMANCE)</div>
         <div class="scroll-area">
             <table>
                 <thead>
                     <tr>
-                        <th>Posição</th>
+                        <th style="width:80px">Posição</th>
                         <th>Vendedor</th>
-                        <th style="text-align:center">Vendas</th>
+                        <th style="text-align:center">Total de Vendas</th>
                     </tr>
                 </thead>
                 <tbody id="tabela-ranking"></tbody>
@@ -118,15 +164,54 @@
         </div>
     </div>
 
-    <div class="charts-grid">
-        <div class="chart-card"><h2>Vendas por Vendedor</h2><canvas id="chartBarras"></canvas></div>
-        <div class="chart-card"><h2>Distribuição de Modelos</h2><canvas id="chartPizza"></canvas></div>
+    <div class="report-table-container">
+        <div class="table-title">DETALHAMENTO DO ARQUIVO HISTÓRICO</div>
+        <div class="scroll-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vendedor</th>
+                        <th>Modelo</th>
+                        <th>Cor</th>
+                        <th>Cidade</th>
+                        <th>Data</th>
+                        <th style="text-align:center">QTD</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-relatorio"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="charts-container">
+        <div class="chart-card">
+            <h2>Vendas por Vendedor</h2>
+            <canvas id="chartBarras"></canvas>
+        </div>
+        <div class="chart-card">
+            <h2>Distribuição de Modelos</h2>
+            <canvas id="chartPizza"></canvas>
+        </div>
     </div>
 </div>
 
 <script>
     const API_URL = ""; 
-    let myBarChart = null, myPieChart = null;
+    let myBarChart = null;
+    let myPieChart = null;
+
+    function getCorStyle(nomeCor) {
+        const c = (nomeCor || "").toUpperCase();
+        if (c.includes("VERMELH")) return "background:#B00404";
+        if (c.includes("AZUL")) return "background:#161692";
+        if (c.includes("PRETO") || c.includes("PRETA")) return "background:#000000";
+        if (c.includes("BRANCO") || c.includes("BRANCA")) return "background:#FFFFFF; color:#333";
+        if (c.includes("AMAREL")) return "background:#FFFF00; color:#000";
+        if (c.includes("LARANJA")) return "background:#FF8C00";
+        if (c.includes("PRATA")) return "background:#C0C0C0; color:#333";
+        if (c.includes("CINZA")) return "background:#808080";
+        return "background:#333";
+    }
 
     async function gerarRelatorio() {
         const mes = document.getElementById('filtro-mes').value;
@@ -136,57 +221,86 @@
         try {
             const res = await fetch(`${API_URL}/get_historico?mes=${mes}&ano=${ano}&dia=${dia}`);
             const vendas = await res.json();
-            document.getElementById('total-geral').innerText = `Total: ${vendas.length}`;
+            document.getElementById('total-geral').innerText = `Total de Vendas: ${vendas.length}`;
+
             if(vendas.length === 0) { limparKpis(); return; }
             processarDados(vendas);
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Erro:", e); }
     }
 
     function limparKpis() {
-        document.getElementById('top-modelos-list').innerHTML = "";
-        document.getElementById('top-vendedores-list').innerHTML = "";
-        document.getElementById('top-cidades-list').innerHTML = "";
-        document.getElementById('total-modelos').innerText = "0 Unidades";
+        document.getElementById('top-modelo').innerText = "---";
+        document.getElementById('top-cor').innerText = "---";
+        document.getElementById('top-vendedor').innerText = "---";
         document.getElementById('total-vendas-vendedor').innerText = "0 Vendas";
-        document.getElementById('total-cidades').innerText = "0 Motos";
+        document.getElementById('top-cidade').innerText = "---";
+        document.getElementById('total-cidade').innerText = "0 Motos";
         document.getElementById('tabela-ranking').innerHTML = "";
+        document.getElementById('tabela-relatorio').innerHTML = "";
     }
 
     function processarDados(vendas) {
-        const modCount = {}, venCount = {}, cidCount = {};
+        const modCount = {}; const venCount = {}; const cidCount = {}; const detailedRows = {};
+
         vendas.forEach(v => {
             modCount[v.modelo] = (modCount[v.modelo] || 0) + 1;
             venCount[v.vendedor] = (venCount[v.vendedor] || 0) + 1;
             cidCount[v.cidade] = (cidCount[v.cidade] || 0) + 1;
+            
+            const rowKey = `${v.vendedor}#${v.modelo}#${v.cor}#${v.cidade}#${v.data}`;
+            detailedRows[rowKey] = (detailedRows[rowKey] || 0) + 1;
         });
 
-        const createTop3 = (countObj, elementId) => {
-            const sorted = Object.entries(countObj).sort((a, b) => b[1] - a[1]).slice(0, 3);
-            const listDiv = document.getElementById(elementId);
-            listDiv.innerHTML = "";
-            sorted.forEach(([name, val], i) => {
-                listDiv.innerHTML += `<div class="top3-item"><span>${i+1}º ${name}</span><b>${val}</b></div>`;
-            });
-            return sorted;
-        };
+        // KPI - Modelo
+        const topM = Object.keys(modCount).reduce((a, b) => modCount[a] > modCount[b] ? a : b);
+        document.getElementById('top-modelo').innerText = topM;
+        document.getElementById('top-cor').innerText = `${modCount[topM]} unidades vendidas`;
 
-        createTop3(modCount, 'top-modelos-list');
-        createTop3(venCount, 'top-vendedores-list');
-        createTop3(cidCount, 'top-cidades-list');
+        // KPI - Vendedor
+        const topV = Object.keys(venCount).reduce((a, b) => venCount[a] > venCount[b] ? a : b);
+        document.getElementById('top-vendedor').innerText = topV;
+        document.getElementById('total-vendas-vendedor').innerText = `${venCount[topV]} Vendas no período`;
 
-        document.getElementById('total-modelos').innerText = `${vendas.length} Unidades`;
-        document.getElementById('total-vendas-vendedor').innerText = `${vendas.length} Vendas no total`;
-        document.getElementById('total-cidades').innerText = `${vendas.length} Motos`;
+        // KPI - Cidade
+        const topC = Object.keys(cidCount).reduce((a, b) => cidCount[a] > cidCount[b] ? a : b);
+        document.getElementById('top-cidade').innerText = topC;
+        document.getElementById('total-cidade').innerText = `${cidCount[topC]} Motos`;
 
+        // RANKING VENDEDORES
         const rankingArray = Object.keys(venCount).map(name => ({ name, total: venCount[name] }));
         rankingArray.sort((a, b) => b.total - a.total);
 
-        const tbody = document.getElementById('tabela-ranking');
-        tbody.innerHTML = "";
+        const tbodyRanking = document.getElementById('tabela-ranking');
+        tbodyRanking.innerHTML = "";
         rankingArray.forEach((item, index) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${index+1}º</td><td style="font-weight:bold; color:white">${item.name}</td><td style="text-align:center">${item.total}</td>`;
-            tbody.appendChild(tr);
+            tr.innerHTML = `
+                <td style="font-family:'Orbitron'">${index + 1}º</td>
+                <td style="font-weight:bold; color:white">${item.name}</td>
+                <td style="text-align:center; font-family:'Orbitron'">${item.total}</td>
+            `;
+            tbodyRanking.appendChild(tr);
+        });
+
+        // TABELA DETALHADA
+        const tbodyDet = document.getElementById('tabela-relatorio');
+        tbodyDet.innerHTML = "";
+        const rowsArray = Object.keys(detailedRows).map(key => {
+            const [vendedor, modelo, cor, cidade, data] = key.split('#');
+            return { vendedor, modelo, cor, cidade, data, qtd: detailedRows[key] };
+        });
+        rowsArray.sort((a, b) => a.vendedor.localeCompare(b.vendedor));
+        rowsArray.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:bold; color:white">${row.vendedor}</td>
+                <td>${row.modelo}</td>
+                <td><span class="badge-color" style="${getCorStyle(row.cor)}">${row.cor}</span></td>
+                <td>${row.cidade}</td>
+                <td style="font-family:'Orbitron'; font-size:12px">${row.data}</td>
+                <td style="text-align:center; font-family:'Orbitron'; font-weight:bold;">${row.qtd}</td>
+            `;
+            tbodyDet.appendChild(tr);
         });
 
         renderCharts(rankingArray, modCount);
@@ -195,22 +309,51 @@
     function renderCharts(rankingData, modelData) {
         const ctxBar = document.getElementById('chartBarras').getContext('2d');
         const ctxPie = document.getElementById('chartPizza').getContext('2d');
-        if (myBarChart) myBarChart.destroy(); if (myPieChart) myPieChart.destroy();
 
-        // Paleta de cores neon para as barras
+        if (myBarChart) myBarChart.destroy();
+        if (myPieChart) myPieChart.destroy();
+
         const colors = ['#FF0055', '#00FFCC', '#FFFF00', '#00FF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080', '#FFFFFF', '#C0C0C0'];
         const barColors = rankingData.map((_, i) => colors[i % colors.length]);
 
         myBarChart = new Chart(ctxBar, {
             type: 'bar',
-            data: { labels: rankingData.map(d => d.name), datasets: [{ label: 'Vendas', data: rankingData.map(d => d.total), backgroundColor: barColors }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { ticks: { color: '#fff' } } }, plugins: { legend: { display: false } } }
+            data: {
+                labels: rankingData.map(d => d.name),
+                datasets: [{
+                    label: 'Vendas',
+                    data: rankingData.map(d => d.total),
+                    backgroundColor: barColors,
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#fff' } },
+                    x: { ticks: { color: '#fff' } }
+                },
+                plugins: { legend: { display: false } }
+            }
         });
 
         myPieChart = new Chart(ctxPie, {
             type: 'pie',
-            data: { labels: Object.keys(modelData), datasets: [{ data: Object.values(modelData), backgroundColor: colors }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
+            data: {
+                labels: Object.keys(modelData),
+                datasets: [{
+                    data: Object.values(modelData),
+                    backgroundColor: colors,
+                    borderColor: '#1a1a1a'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
+            }
         });
     }
 
