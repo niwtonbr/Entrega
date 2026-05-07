@@ -14,14 +14,12 @@
             --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         }
 
-        /* Estilização da Barra de Rolagem (Scrollbar) */
         ::-webkit-scrollbar { width: 12px; }
         ::-webkit-scrollbar-track { background: #5dc9ea; border-radius: 15px; }
         ::-webkit-scrollbar-thumb { background: var(--honda-red); border-radius: 10px; border: 2px solid #f1f1f1; }
         ::-webkit-scrollbar-thumb:hover { background: var(--honda-dark); }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body { 
             font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; 
             background: var(--bg-color); 
@@ -43,13 +41,7 @@
         }
 
         .header-left { display: flex; align-items: center; gap: 15px; }
-        .logo-honda { 
-            width: 42px !important; 
-            height: auto;
-            filter: brightness(0) invert(1) !important;
-            transition: 0.3s; 
-            object-fit: contain;
-        }
+        .logo-honda { width: 42px !important; height: auto; filter: brightness(0) invert(1) !important; object-fit: contain; }
         .logo-text { font-family: 'Brush Script MT', cursive; font-size: 36px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
         #relogio { font-family: 'Consolas', monospace; font-weight: bold; font-size: 24px; background: #000; color: #00ff00; padding: 6px 18px; border-radius: 10px; border: 2px solid #444; }
         
@@ -74,7 +66,7 @@
         .readonly-box { background: #f9f9f9; font-weight: bold; color: var(--honda-red); }
         
         .btn-enviar { width: 100%; padding: 15px; background: linear-gradient(to right, #1a1a7a, #0d0d4d); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 10px; transition: 0.3s; margin-top: 10px; }
-        .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
+        .btn-enviar.sucesso { background: linear-gradient(to right, #28a745, #1e7e34) !important; }
 
         .table-container { flex: 1; overflow-y: auto; margin-top: 15px; border-radius: 10px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -172,7 +164,7 @@
         <div class="form-group"><label>CIDADE</label><select id="cidade"></select></div>
         <div class="form-group"><label>NOTA FISCAL</label><input type="text" id="nf"></div>
         <div class="form-group"><label>OBSERVAÇÃO</label><input type="text" id="obs" value="ENTREGA IMEDIATA"></div>
-        <button class="btn-enviar" onclick="enviarDados()">ENVIAR PARA O TELÃO</button>
+        <button id="btnEnviar" class="btn-enviar" onclick="enviarDados()">ENVIAR PARA O TELÃO</button>
     </div>
 
     <div class="col-tabela">
@@ -285,6 +277,7 @@
     }
 
     async function enviarDados() {
+        const btn = document.getElementById('btnEnviar');
         const payload = {
             nf: document.getElementById('nf').value, data: document.getElementById('data').value,
             hora: document.getElementById('hora').value, modelo: document.getElementById('modelo').value,
@@ -294,23 +287,37 @@
         };
 
         try {
-            // Envia para o banco e histórico simultaneamente
+            // Efeito visual no botão
+            const textoOriginal = btn.innerText;
+            btn.innerText = "ENVIANDO...";
+            btn.disabled = true;
+
             const resS = await fetch(`${API_URL}/salvar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
             const resH = await fetch(`${API_URL}/registrar_historico`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
             
             if (resS.ok && resH.ok) {
-                // 1. Atualiza a tabela IMEDIATAMENTE sem atualizar a página
+                // 1. Atualiza a tabela da direita IMEDIATAMENTE
                 await buscarNoBanco();
                 
-                // 2. Limpa apenas os campos que mudam a cada moto para agilizar o cadastro
+                // 2. Limpa campos e atualiza registro
                 document.getElementById('chassi').value = "";
                 document.getElementById('nf').value = "";
-                
-                // 3. Atualiza o número do registro para a próxima moto
                 await atualizarNumeroReg();
+
+                // 3. Feedback visual de sucesso no botão (SÓ POR 2 SEGUNDOS)
+                btn.innerText = "✅ ENVIADO!";
+                btn.classList.add('sucesso');
+                
+                setTimeout(() => {
+                    btn.innerText = textoOriginal;
+                    btn.classList.remove('sucesso');
+                    btn.disabled = false;
+                }, 2000);
             }
         } catch (e) { 
-            console.error("Erro ao enviar:", e); 
+            console.error(e);
+            btn.disabled = false;
+            btn.innerText = "ERRO AO ENVIAR";
         }
     }
 
